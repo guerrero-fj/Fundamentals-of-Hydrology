@@ -1,0 +1,90 @@
+{
+  "main": {
+    "id": "544a29283be834e9",
+    "type": "split",
+    "children": [
+      {
+        "id": "d2a61ca5d70685f5",
+        "type": "leaf",
+        "state": {
+          "type": "empty",
+          "state": {}
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "fc45d720b62807c8",
+    "type": "split",
+    "children": [
+      {
+        "id": "bf039b83af1e88a7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "abc6d73efbd7c75a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "cdaa2f874b83df03",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "32303768c117c979",
+    "type": "split",
+    "children": [
+      {
+        "id": "b8da488878192d05",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e7bd19af725f090f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "d2a61ca5d70685f5",
+  "lastOpenFiles": [
+    "platforms/RStudio.md",
+    "workflows/Customizing R Studio Themes.md"
+  ]
+}
