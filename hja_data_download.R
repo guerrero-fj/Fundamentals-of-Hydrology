@@ -1,14 +1,7 @@
 ################################################################################
-# Predicting Total Suspended Solids in Headwater Streams in the Oregon Cascades
+# Water quality data in Headwater Streams in the Oregon Cascades
 ################################################################################
 
-#EXPLORATORY DATA ANALYSIS
-
-#SET UP
-
-#Packages
-
-#DATA
 
 # Package ID: knb-lter-and.4021.23 Cataloging System:https://pasta.edirepository.org.
 # Data set title: Stream chemistry concentrations and fluxes using proportional sampling in the Andrews Experimental Forest, 1968 to present.
