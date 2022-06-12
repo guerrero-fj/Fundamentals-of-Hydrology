@@ -106,9 +106,11 @@ if (class(dt1$ENTITY)=="character") dt1$ENTITY <-as.numeric(dt1$ENTITY)
 if (class(dt1$SITECODE)!="factor") dt1$SITECODE<- as.factor(dt1$SITECODE)
 if (class(dt1$WATERYEAR)=="factor") dt1$WATERYEAR <-as.numeric(levels(dt1$WATERYEAR))[as.integer(dt1$WATERYEAR) ]               
 if (class(dt1$WATERYEAR)=="character") dt1$WATERYEAR <-as.numeric(dt1$WATERYEAR)                                   
+
 # attempting to convert dt1$DATE_TIME dateTime string to R date structure (date or POSIXct)                                
 tmpDateFormat<-"%Y-%m-%d %H:%M:%S" 
 tmp1DATE_TIME<-as.POSIXct(dt1$DATE_TIME,format=tmpDateFormat)
+
 # Keep the new dates only if they all converted correctly
 if(length(tmp1DATE_TIME) == length(tmp1DATE_TIME[!is.na(tmp1DATE_TIME)])){dt1$DATE_TIME <- tmp1DATE_TIME } else {print("Date conversion failed for dt1$DATE_TIME. Please inspect the data and do the date conversion yourself.")}                                                                    
 rm(tmpDateFormat,tmp1DATE_TIME) 
@@ -202,8 +204,6 @@ if (class(dt1$ANCACODE)!="factor") dt1$ANCACODE<- as.factor(dt1$ANCACODE)
 
 # Convert Missing Values to NA for non-dates
 
-
-
 # Here is the structure of the input data frame:
 str(dt1)                            
 attach(dt1)                            
@@ -272,6 +272,7 @@ summary(PVOL)
 summary(PVOLCODE)
 summary(ANCA)
 summary(ANCACODE) 
+
 # Get more details on character variables
 
 summary(as.factor(dt1$STCODE)) 
