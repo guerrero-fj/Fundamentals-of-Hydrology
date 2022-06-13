@@ -752,3 +752,27 @@ wd_thp_9_ssn_fig <- ggplot(filter(hjg_cp,ws=="GSWS09"), aes(y=slc.mg_l, x=q.cm,c
         legend.position = "none")+
   facet_wrap(~wy)
 wd_thp_9_ssn_fig 
+
+
+
+#####
+# Relationships with suspended sediments
+#
+
+
+tss_si <- ggplot(hjg_cp, aes(slc.mg_l,sed.mg_l, fill = ws))+
+  geom_point()+
+  facet_wrap(~ws)+
+  scale_y_log10()
+tss_si
+
+tss_si_na <- ggplot(hjg_cp, aes(Mg_Na,sed.mg_l, fill = ws))+
+  geom_point()+
+  facet_wrap(~ws)+
+  scale_x_log10()+
+  scale_y_log10()
+tss_si_na
+
+
+model <- lm(log(ptn.mg_l)~log(sed.mg_l)+log(q.cm)+log(cnd.us_s)+log(slc.mg_l)+log(Si_Ca)+ssn+ws,na.omit(hjg_cp))
+summary(model)
