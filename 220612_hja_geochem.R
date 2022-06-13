@@ -9,7 +9,7 @@
 #LOADING LIBRARIES AND SETTING WORKING DIRECTORIES
 ###################################################
 
-rm(list=ls())#Cleaning global enviroment
+rm(list=ls())#Cleaning global environment
 gc()#garbage collector
 
 #Loading libraries
