@@ -1,0 +1,295 @@
+---
+title: "Exploratory Data Analysis for Beta Regression %TC WS09 & WS10"
+author: "Guerrero et al."
+date: "July 11, 2019"
+output: html_document
+---
+Loading all required libraries (hidden chunk)
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(ggplot2)
+library(reshape2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(plyr)
+library(dplyr)
+library(nlme)
+library(doBy)
+library(MASS)
+library(lsmeans)
+library(carData)
+library(utils)
+library(multcompView)
+library(VIF)
+library(cowplot)
+library(scales)
+library(imputeTS)
+library(RColorBrewer)
+library(tidyr)
+library(gridExtra)
+library(lattice)
+library(grid)
+library(gridBase)
+library(lmtest)
+library(gstat)
+library(sp)
+library(zoo)
+library(yhat)
+library(tools)
+library(broom)
+library(dotwhisker)
+library(betareg)
+```
+
+In this document, I explore the dataset in terms of overall distributions for both response variables and covariates between watersheds and among seasons. This analysis will conclude with a tentative structure for the statistical model to be used to simulate the data generating process behind the (beta) distribution for TC. 
+
+Temporarily the data matrices will be available on the specified google drive folders with links provided below.
+
+Make sure you install the package RCurl to be able to download the data from google drive. 
+
+```{r message=FALSE,warning=FALSE}
+#Dataset:Available in google drive
+# install.packages("RCurl")
+require(RCurl)
+link <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcFR5NyVmU-A93BBtEhtzJ2IQfoOhQFv7EGsdKs5oJ8yhuorE_42TIpL5jwozdJiwgL0snQykH8plL/pub?output=csv"
+url <- getURL(link)
+con <- textConnection(url)
+hjh <- read.csv(con)
+```
+
+
+Re-formatting some of the columns
+```{r message=FALSE, warning=FALSE}
+hjh$fch<-as.Date(hjh$fch)
+hjh$ws.f<-factor(hjh$ws.f,levels = c("Old-growth","Logged"))
+hjh$ssn<-factor(hjh$ssn, levels = c ("Fall","Winter","Spring","Summer"))
+```
+
+##Exploratory data analysis for calibration and prediction dataset
+
+###Overall distributions
+
+We select predictors and response variables for the model and re-format the dataset into a long form
+
+```{r message=FALSE, warning=FALSE}
+hjh_eda<-dplyr::select(hjh,ws.f,msr,ssn,tc.mg_mgsed,log.slc.mg_l,log.don.mg_l,log.sed.mg_l,log.uq)
+colnames(hjh_eda)<-c("Watershed","Measurement","Season","Fraction_TC","log_Si","log_DON","log_TSS","log_Q")
+hjh_eda$WS<-ifelse(hjh_eda$Watershed=="Old-growth","WS09","WS10")
+hjh_eda$WS<-factor(hjh_eda$WS,levels = c("WS09","WS10"))
+hjh_eda$model_p<-ifelse(hjh_eda$Measurement=="md","Calibration","Prediction")
+hjh_eda1<-gather(hjh_eda,"Variables","Values",c(4:8),factor_key = TRUE)
+hjh_eda2<-dplyr::filter(hjh_eda,Measurement=="md")
+```
+
+We start with a pairs plot that include some density functions
+
+```{r message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
+require(GGally)
+my_fn <- function(data, mapping, method="loess", ...){
+  p <- ggplot(data = data, mapping = mapping) + 
+    geom_point() + 
+    geom_smooth(method=method, ...)
+  p
+}
+
+p<-ggpairs(hjh_eda2, columns = 4:8, ggplot2::aes(colour = WS, alpha = 0.6),
+           lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+      scale_fill_manual(values=c("#5e3c99","#e66101")) +
+      scale_color_manual(values=c("#5e3c99","#e66101"))  
+  }
+}
+p
+```
+
+###Observations:
+1.The correlation between TC~Si,DON, and Q depends on the watershed (as evidenced by the distinct correlation coefficients per watershed).
+2.The correlation between TC and TSS appears pretty similar between WS-09 and WS-10.
+3.The largest overall correlation between a pair of covariates is -0.51 and corresponds to the pair Si-Q. Yet this correlation is mostly driven by the relationship between these two covariates in WS-09 (r = 0.8).
+4.The relationship between TC and TSS exhibits concave curvature suggesting the inclusion of a second order term for TSS.
+5.TC values > 0.4 appear as outliers and potential influencial observations for any linear trend.
+
+
+###Cablibration vs. Prediction datasets
+After confirming that the selected predictors are linearly correlated with our response 
+variable, we need to do some clean up within our dataset. This process involve removing
+potential outliers and comparing the ranges of our calibration dataset with those in our
+prediction dataset.
+
+To do so, we will use box plots
+
+```{r message=FALSE, warning=FALSE,}
+hjh_eda_p<-ggplot(hjh_eda1,aes(model_p,Values,color=Watershed, fill = Watershed))+
+  geom_boxplot(aes(y=Values),alpha=0.6)+
+  scale_color_manual(values=c("#5e3c99","#e66101"))+
+  scale_fill_manual(values=c("#5e3c99","#e66101"))+
+  labs(x="Modeling phase")+
+  facet_wrap(~Variables,ncol=2,scales="free_y")
+hjh_eda_p
+```
+
+As suspected from our previous plot, TC>0.4 showed up as outliers. Also, there is little overlap
+between the calibration and prediction TSS data. This is because one of the lowest
+TSS concentrations with a corresponding TC measurement is about 1.5 mg/l, with an outlier measurement
+at 0.4 mg/l (this last observation actually corresponds to one of our outlying TC values). As a compromise, and
+to avoid an extreme lost of measurements, we used TSS >=1 mg/l in TSS as at lower boundary for predicting TC from TSS measurements (the average between 0.4 and 1.5 mg/l).
+
+To assess the impact of setting a lower boundary for TSS on the characterization of the sediment loads across our 
+dataset, we compare the total loads over the period of study calculated before and after applying such a lower boundary:
+
+We want to know the fraction of the total sediment load that would not be covered by our predictions.
+
+First, we calculate the sediment load across the original dataset
+
+```{r}
+hjh$sed_load<-(hjh$sed.mg_l*hjh$uq.cm)/10
+```
+
+And set a lower boundary for TSS = 0.999 mg/l or on log scale (-0.01)
+```{r}
+bnd=-0.01
+```
+
+Now, we examine the impact of limiting our TSS prediction range on the characterization of the sediment load across the dataset
+
+```{r}
+hjh_hs<-dplyr::filter(hjh,log.sed.mg_l>bnd)#It corresponds to 698/1134 observations
+tot_hs<-sum(hjh_hs$sed_load)#Total sed load associated to sediment concentrations >= 1 mg/l is 8593
+tot_sld<-sum(hjh$sed_load)#Total sed load accounted for the dataset is 8736
+sed_load_ft<-(tot_hs/tot_sld)*100
+sed_load_ft
+```
+
+The percentage of the sediment load accounted in our analysis is 98.4%
+
+We then apply both TC and TSS criteria to our dataset as follows:
+
+```{r}
+hjh_eda$Fraction_TC<-ifelse(hjh_eda$Fraction_TC>0.399,NA,hjh_eda$Fraction_TC)
+hjh_eda<-dplyr::filter(hjh_eda,log_TSS>(-0.01))
+```
+
+And make a new pairs plot
+
+```{r message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
+p<-ggpairs(filter(hjh_eda,Measurement == "md"), columns = 4:8, ggplot2::aes(colour = WS, alpha = 0.5),
+           lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+      scale_fill_manual(values=c("#5e3c99","#e66101")) +
+      scale_color_manual(values=c("#5e3c99","#e66101"))  
+  }
+}
+p
+```
+
+We observe an improvement in the overall linearity of the relationships between TC and the covariates. Also, There are two observations that appear quite separated from the group in terms of TSS values. But these observations correspond to the floods recorded in 1996, which we want to try to keep in the model unless other sources of evidence indicate they need to be removed.
+
+
+###Seasonal distributions
+
+Since these data comes from a time series, let's check some changes associated to seasonality (as a categorical factor) per 
+watershed
+
+#####Old-growth
+
+```{r message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
+require(GGally)
+p<-ggpairs(filter(hjh_eda,Watershed=="Old-growth"), columns = 3:8, 
+           ggplot2::aes(colour = Season, alpha = 0.5), title = "Old-growth (WS09)",
+           lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+      scale_fill_manual(values=c("#F8766D","#C77CFF","#7CAE00","#00BFC4")) +
+      scale_color_manual(values=c("#F8766D","#C77CFF","#7CAE00","#00BFC4"))  
+  }
+}
+p
+```
+
+
+
+
+####Logged
+
+```{r message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
+require(GGally)
+p<-ggpairs(filter(hjh_eda,Watershed=="Logged"), columns = 3:8, 
+           ggplot2::aes(colour = Season, alpha = 0.5), title = "Logged (WS10)",
+           lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+      scale_fill_manual(values=c("#F8766D","#C77CFF","#7CAE00","#00BFC4")) +
+      scale_color_manual(values=c("#F8766D","#C77CFF","#7CAE00","#00BFC4"))  
+  }
+}
+p
+```
+
+###Observations:
+
+TC, Si, and DON exhibit clear seasonal changes. However, seasonal changes in TC and Si are different between WS09 and WS10. 
+
+There is superposition among the seasonal distributions of the variables in the model. The pattern of seasonal superposition for TSS and DON are relatively similar between WS09 and WS10. The seasonal superposition for TC, Si, and Q exhibits contrasting behavior between our study sites. 
+
+In WS09 there is extensive overlap between summer, fall, and spring in terms of TC. This group of seasonal distributions, which are left skewed, contrasts with the winter distribution of TC, which is right-skewed, indicating a reduction in the carbon content of the sediments during the cold-wet season. In WS-10, there is extensive overlap among all seasonal distributions, which in turn, are right-skewed, suggesting lower TC content in the sediments from the logged study site.
+
+The overlap among seasonal distributions for Si is higher in WS10 than in WS09. In the Old-growth forest site there is almost no superposition between winter and summer in terms of dissolved silica. Also, in WS09, Si distribution during fall is clearly bi-modal. In WS-10, there is more overlap between winter and summer distributions for Si and almost no indication of bi-modality during the fall. 
+
+In terms of discharge, there is more separation among water-spring flows and summer flows in WS10 than in WS09.
+
+##Summary
+
+In summary, we observe that there is a strong seasonal variation in TC content in these sediments that could be also related to the changes in the amount of superposition of the seasonal distributions of the selected covariates. In other words, the conditional distribution of TC on Si, TSS, Q, and DON is inherently heterogeneous. This heteroskedasticity can be handled by means of generalized linear models, which in the specific case of variables measured on a proportional scale, should be a beta distribution model. 
+
+Based on this exploratory data analysis, a starting point for such a model would be of the form:
+
+TC ~ Watershed * (log[Si] + log[DON] + log[Q]) + log[TSS] + log[TSS]^2 + Season 
+
+With TC (~Beta distributed)
+
+This model would naturally encompass the heterogeneity in TC distributions and the different slopes of the relationships between our response variable and its covariates in our study sites. 
+
+##Supplement
+Packages loaded (required) for this code:
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(reshape2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(plyr)
+library(dplyr)
+library(nlme)
+library(doBy)
+library(MASS)
+library(lsmeans)
+library(carData)
+library(utils)
+library(multcompView)
+library(VIF)
+library(cowplot)
+library(scales)
+library(imputeTS)
+library(RColorBrewer)
+library(tidyr)
+library(gridExtra)
+library(lattice)
+library(grid)
+library(gridBase)
+library(lmtest)
+library(gstat)
+library(sp)
+library(zoo)
+library(yhat)
+library(tools)
+library(broom)
+library(dotwhisker)
+library(betareg)
+```
