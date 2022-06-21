@@ -40,7 +40,7 @@ The asterisk is another helpful symbol. You can make a simple bulleted list with
 
 An even put in a picture (the file image.jpg needs to be in the same folder/directory as this file)
 
-![the water cycle](water_cycle.jpg)
+![](water_cycle.jpg)
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
