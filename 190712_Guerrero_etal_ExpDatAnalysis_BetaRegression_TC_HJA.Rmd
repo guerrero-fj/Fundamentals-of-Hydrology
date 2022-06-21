@@ -48,13 +48,7 @@ Temporarily the data matrices will be available on the specified google drive fo
 Make sure you install the package RCurl to be able to download the data from google drive. 
 
 ```{r message=FALSE,warning=FALSE}
-#Dataset:Available in google drive
-# install.packages("RCurl")
-require(RCurl)
-link <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcFR5NyVmU-A93BBtEhtzJ2IQfoOhQFv7EGsdKs5oJ8yhuorE_42TIpL5jwozdJiwgL0snQykH8plL/pub?output=csv"
-url <- getURL(link)
-con <- textConnection(url)
-hjh <- read.csv(con)
+hjh <- read.csv("200114_hja_gchm_cont.csv", na.strings = "")
 ```
 
 
