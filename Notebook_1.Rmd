@@ -16,9 +16,130 @@ Today, we are going to explore stream flow data. These data span several decades
 #                 "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")
 ```
 
+## Loading packages
+
+Once we have installed the packages, we need to load them into our workspace, so they can do their magic for us. Let's start with a great one: ggplot2. [ggplot2]() is one of the most complete packages for data visualization, if you are curios about more details, take a look at the webpage.  To load a package we wil use the command "library". You need to do this just once, so I normally load my packages at the begining of my session in r. 
+
+```{r}
+library(ggplot2)
+```
+
+
+## Loading the data
+
+A detailed explanation of these datasets can be found at the [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) webpage. More context about our study case can be found in this [MURAL]() for one of my recent scientific presentations. We will go over this study case in class.
+
+```{r}
+hjg <- read.csv("220621_fho_hjandrews.csv")
+summary (hjg)
+```
+
+
+Let's take a look at the raw discharge data. 
+
+```{r}
+ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
+  geom_point(alpha=0.8,size=3.5)+
+  ylab("Unit discharge (cm)") +
+  xlab("Water day")+
+  theme(axis.text=element_text(colour="black",size=14),
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_blank(),
+        panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
+        panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
+        panel.border = element_rect(fill=NA, colour = "black", size=1),
+        panel.background=element_blank(),
+        axis.ticks.length = unit(0.254, "cm"),
+        axis.ticks = element_line(colour = "black", size=1), 
+        axis.line = element_line(colour = "black"),
+        legend.position = c(.90,.90),
+        legend.direction = "vertical",
+        legend.background = element_rect(fill=alpha(0.1)),
+        legend.title = element_blank())+
+  facet_wrap(~ws)
+ssn_plot
+```
+
+Another look at these data from a frequency/probabilistic perspective:
+
+```{r}
+ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
+  geom_density()+
+  ylab("Unit discharge (cm)") +
+  scale_x_log10()+
+  theme(axis.text=element_text(colour="black",size=14),
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_blank(),
+        panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
+        panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
+        panel.border = element_rect(fill=NA, colour = "black", size=1),
+        panel.background=element_blank(),
+        axis.ticks.length = unit(0.254, "cm"),
+        axis.ticks = element_line(colour = "black", size=1), 
+        axis.line = element_line(colour = "black"),
+        legend.position = c(.90,.90),
+        legend.direction = "vertical",
+        legend.background = element_rect(fill=alpha(0.1)),
+        legend.title = element_blank())+
+  facet_wrap(~ws)
+ssn_plot
+```
 
 
 
+
+```{r}
+#Checking season assignment plot
+ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
+  geom_point(alpha=0.8,size=3.5)+
+  ylab("Unit discharge (cm)") +
+  xlab("Water day")+
+  theme(axis.text=element_text(colour="black",size=14),
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_blank(),
+        panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
+        panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
+        panel.border = element_rect(fill=NA, colour = "black", size=1),
+        panel.background=element_blank(),
+        axis.ticks.length = unit(0.254, "cm"),
+        axis.ticks = element_line(colour = "black", size=1), 
+        axis.line = element_line(colour = "black"),
+        legend.position = c(.90,.90),
+        legend.direction = "vertical",
+        legend.background = element_rect(fill=alpha(0.1)),
+        legend.title = element_blank())+
+  facet_wrap(~ws)
+ssn_plot
+```
+
+
+
+
+
+
+```{r}
+#Checking season assignment plot
+ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
+  geom_point(alpha=0.8,size=3.5)+
+  ylab("Unit discharge (cm)") +
+  xlab("Water day")+
+  theme(axis.text=element_text(colour="black",size=14),
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_blank(),
+        panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
+        panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
+        panel.border = element_rect(fill=NA, colour = "black", size=1),
+        panel.background=element_blank(),
+        axis.ticks.length = unit(0.254, "cm"),
+        axis.ticks = element_line(colour = "black", size=1), 
+        axis.line = element_line(colour = "black"),
+        legend.position = c(.90,.90),
+        legend.direction = "vertical",
+        legend.background = element_rect(fill=alpha(0.1)),
+        legend.title = element_blank())+
+  facet_wrap(~ws)
+ssn_plot
+```
 
 
 
