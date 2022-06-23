@@ -12,18 +12,17 @@ Today, we are going to explore stream flow data. These data span several decades
 ## Setting up
 
 ```{r}
-#install.packages("ggplot2","reshape","lubridate","gridExtra","grid","plyr","dplyr",
-#                 "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")
+install.packages("ggplot2","lubridate","gridExtra","grid","plyr","dplyr",
+                "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")
 ```
 
 ## Loading packages
 
-Once we have installed the packages, we need to load them into our workspace, so they can do their magic for us. Let's start with a great one: ggplot2. [ggplot2]() is one of the most complete packages for data visualization, if you are curios about more details, take a look at the webpage.  To load a package we wil use the command "library". You need to do this just once, so I normally load my packages at the begining of my session in r. 
+Once we have installed the packages, we need to load them into our workspace, so they can do their magic for us. Let's start with a great one: ggplot2. [ggplot2]() is one of the most complete packages for data visualization, if you are curios about more details, take a look at the webpage. To load a package we wil use the command "library". You need to do this just once, so I normally load my packages at the begining of my session in r.
 
 ```{r}
 library(ggplot2)
 ```
-
 
 ## Loading the data
 
@@ -34,8 +33,7 @@ hjg <- read.csv("220621_fho_hjandrews.csv")
 summary (hjg)
 ```
 
-
-Let's take a look at the raw discharge data. 
+Let's take a look at the raw discharge data.
 
 ```{r}
 ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
@@ -85,9 +83,6 @@ ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
 ssn_plot
 ```
 
-
-
-
 ```{r}
 #Checking season assignment plot
 ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
@@ -112,15 +107,9 @@ ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
 ssn_plot
 ```
 
-
 ## Your homework:
 
-* How would you explain the concept of unit discharge and its measurement to a lay person?
-* What would you say are the differences in looking at discharge data as a time series or as a histogram/density plot?
-* What is the difference between a Normal distribution and a log-normal distribution. 
-* Why do you think discharge data tend to fit a log-normal distribution. Explain
-
-
-
-
-
+-   How would you explain the concept of unit discharge and its measurement to a lay person?
+-   What would you say are the differences in looking at discharge data as a time series or as a histogram/density plot?
+-   What is the difference between a Normal distribution and a log-normal distribution.
+-   Why do you think discharge data tend to fit a log-normal distribution. Explain
