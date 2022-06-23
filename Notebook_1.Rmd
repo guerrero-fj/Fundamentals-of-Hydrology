@@ -9,6 +9,10 @@ output: html_notebook
 
 Today, we are going to explore stream flow data. These data span several decades and are part of a Long Term Ecological Research Forest in Oregon. The [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) is located in the Oregon Cascades. But before looking at these data, we need to install some packages that are going to make it easier for us
 
+```{r}
+"NOTE: The preview button is only available when the output is an html file"
+```
+
 ## Setting up
 
 ```{r}
@@ -18,6 +22,7 @@ install.packages(c("lubridate","gridExtra","grid","plyr","dplyr",
 ```
 
 ## Loading packages
+
 
 Once we have installed the packages, we need to load them into our workspace, so they can do their magic for us. Let's start with a great one: ggplot2. [ggplot2]() is one of the most complete packages for data visualization, if you are curios about more details, take a look at the webpage. To load a package we wil use the command "library". You need to do this just once, so I normally load my packages at the begining of my session in r.
 
@@ -38,14 +43,14 @@ Let's take a look at the raw discharge data.
 
 ```{r}
 ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
-  geom_point(alpha=0.8,size=3.5)+
- # geom_line()+
-  # geom_smooth()+
+  # geom_point(alpha=0.8,size=3.5)+
+  geom_line(alpha=0.6)+# by changing alpha, we change the transparency
+  geom_smooth(span = 0.15)+# by changing span, I control the wiggles in the trend
   ylab("Unit discharge (cm)") +
   xlab("Water day")+
   theme(axis.text=element_text(colour="black",size=14),
         axis.title.y = element_text(size = 20),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 20),
         panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
         panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
         panel.border = element_rect(fill=NA, colour = "black", size=1),
@@ -64,9 +69,9 @@ ssn_plot
 Let's save ourselves a headache with such long chunks of code by defining our theme for each figure
 
 ```{r}
-theme_fg <- theme(axis.text=element_text(colour="black",size=14),
+theme_fg = theme(axis.text=element_text(colour="black",size=14),
         axis.title.y = element_text(size = 20),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 20),
         panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
         panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
         panel.border = element_rect(fill=NA, colour = "black", size=1),
@@ -79,9 +84,6 @@ theme_fg <- theme(axis.text=element_text(colour="black",size=14),
         legend.background = element_rect(fill=alpha(0.1)),
         legend.title = element_blank())
 ```
-
-
-
 
 
 Another look at these data from a frequency/probabilistic perspective:
