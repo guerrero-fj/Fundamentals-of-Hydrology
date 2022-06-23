@@ -12,8 +12,9 @@ Today, we are going to explore stream flow data. These data span several decades
 ## Setting up
 
 ```{r}
-install.packages("ggplot2","lubridate","gridExtra","grid","plyr","dplyr",
-                "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")
+install.packages(c("lubridate","gridExtra","grid","plyr","dplyr",
+                "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")) 
+# For this line to run, I had to 1) go to Tools -> Global Options -> Packages, and uncheck the box "Use secure download methods for HTTP" and 2) define the list of packages names as a vector by using c("package name 1",...)
 ```
 
 ## Loading packages
@@ -38,6 +39,8 @@ Let's take a look at the raw discharge data.
 ```{r}
 ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
   geom_point(alpha=0.8,size=3.5)+
+ # geom_line()+
+  # geom_smooth()+
   ylab("Unit discharge (cm)") +
   xlab("Water day")+
   theme(axis.text=element_text(colour="black",size=14),
@@ -58,14 +61,10 @@ ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
 ssn_plot
 ```
 
-Another look at these data from a frequency/probabilistic perspective:
+Let's save ourselves a headache with such long chunks of code by defining our theme for each figure
 
 ```{r}
-ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
-  geom_density()+
-  ylab("Unit discharge (cm)") +
-  scale_x_log10()+
-  theme(axis.text=element_text(colour="black",size=14),
+theme_fg <- theme(axis.text=element_text(colour="black",size=14),
         axis.title.y = element_text(size = 20),
         axis.title.x = element_blank(),
         panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
@@ -78,7 +77,22 @@ ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
         legend.position = c(.90,.90),
         legend.direction = "vertical",
         legend.background = element_rect(fill=alpha(0.1)),
-        legend.title = element_blank())+
+        legend.title = element_blank())
+```
+
+
+
+
+
+Another look at these data from a frequency/probabilistic perspective:
+
+```{r}
+ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
+  geom_density(alpha = 0.5, size = 1.0)+
+  ylab("Kernel Density Estimate") +
+  xlab("Unit discharge (cm)")+
+  # scale_x_log10()+
+  theme_fg +
   facet_wrap(~ws)
 ssn_plot
 ```
@@ -86,23 +100,10 @@ ssn_plot
 ```{r}
 #Checking season assignment plot
 ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
-  geom_point(alpha=0.8,size=3.5)+
+  geom_line(alpha=0.8,size=3.5)+
   ylab("Unit discharge (cm)") +
   xlab("Water day")+
-  theme(axis.text=element_text(colour="black",size=14),
-        axis.title.y = element_text(size = 20),
-        axis.title.x = element_blank(),
-        panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
-        panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
-        panel.border = element_rect(fill=NA, colour = "black", size=1),
-        panel.background=element_blank(),
-        axis.ticks.length = unit(0.254, "cm"),
-        axis.ticks = element_line(colour = "black", size=1), 
-        axis.line = element_line(colour = "black"),
-        legend.position = c(.90,.90),
-        legend.direction = "vertical",
-        legend.background = element_rect(fill=alpha(0.1)),
-        legend.title = element_blank())+
+  theme_fg +
   facet_wrap(~ws)
 ssn_plot
 ```
