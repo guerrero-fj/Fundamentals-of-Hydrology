@@ -36,13 +36,13 @@ A detailed explanation of these datasets can be found at the [H.J.Andrews LTER](
 
 ```{r}
 hjg <- read.csv("220621_fho_hjandrews.csv")
-summary (hjg)
+#summary (hjg)
 ```
 
 Let's take a look at the raw discharge data.
 
 ```{r}
-ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
+uq_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
   # geom_point(alpha=0.8,size=3.5)+
   geom_line(alpha=0.6)+# by changing alpha, we change the transparency
   geom_smooth(span = 0.15)+# by changing span, I control the wiggles in the trend
@@ -63,7 +63,7 @@ ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
         legend.background = element_rect(fill=alpha(0.1)),
         legend.title = element_blank())+
   facet_wrap(~ws)
-ssn_plot
+uq_plot
 ```
 
 Let's save ourselves a headache with such long chunks of code by defining our theme for each figure
@@ -85,30 +85,128 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
         legend.title = element_blank())
 ```
 
+Now, let's add some understandable labels for our watershed treatments. To do so in a way that it is preserved for future plots, we need to modify our dataset "hjg". It turns out that we already have a colum in our data set to do so, it's ws.f (watershed as a factor). You can call for any column in a dataset by using the $ sign.
+
+```{r}
+hjg$ws.f
+```
+
+If we want the shorter version of this column, we can use the function "unique" to obtain the levels of the factor without repetition
+
+```{r}
+unique(hjg$ws.f)
+```
 
 Another look at these data from a frequency/probabilistic perspective:
 
 ```{r}
-ssn_plot <- ggplot(hjg, aes(x=uq.cm,color=as.factor(ws), fill =as.factor(ws)))+
+uq_p_plot <- ggplot(hjg, aes(x=uq.cm,color= ws.f, fill = ws.f))+
   geom_density(alpha = 0.5, size = 1.0)+
   ylab("Kernel Density Estimate") +
   xlab("Unit discharge (cm)")+
-  # scale_x_log10()+
   theme_fg +
+  facet_wrap(~ws.f)
+uq_p_plot
+```
+
+Now, we normally associate the blue color with the control and the red color with the treatment. 
+Let's change these colors. 
+
+First, we don't need to write the entire code again as the plot already exists as an object. So, if we want to see this plot again, for now on, we can just call the plot name within a chunk:
+
+```{r}
+uq_p_plot
+```
+
+We can now add the changes we want and re plot:
+
+```{r}
+uq_p_plot <- uq_p_plot + scale_color_manual(values = c("#00BFC4","#F8766D"))+
+                         scale_fill_manual(values = c("#00BFC4","#F8766D"))
+uq_p_plot
+```
+Question: Do these distributions look normal?
+
+Let's try to use a different scale for the x axis:
+
+
+```{r}
+uq_p_plot <- uq_p_plot + scale_x_log10()  
+uq_p_plot
+```
+
+Now, the legend is kind of in the middle, let's move it to a different location
+
+```{r}
+uq_p_plot <- uq_p_plot + theme(legend.position = c(0.1,0.8))
+uq_p_plot
+```
+Question: Does it look like the distribution of the streamflow is the same?
+
+Let's take a look at the seasonal changes to explore more about the potential differences:
+
+```{r}
+#Checking season assignment plot
+ssn_plot <- ggplot(hjg, aes(x=uq.cm, color=as.factor(ssn), fill = as.factor (ssn)))+
+  geom_density(alpha = 0.5)+
+  ylab("Kernel density estimate") +
+  xlab("Unit discharge (cm)")+
+  scale_x_log10()+
+  scale_color_manual()
+  theme_fg +
+  facet_wrap(~ws.f)
+ssn_plot
+```
+
+
+
+
+Second, let's add some understandable labels for our watershed treatments. To do so in a way that it is preserved for future plots, we need to modify our dataset "hjg". It turns out that we already have a colum in our data set to do so, it's ws.f (watershed as a factor). You can call for any column in a dataset by using the $ sign.
+
+```{r}
+hjg$ws.f
+```
+
+If we want the shorter version of this column, we can use the function "unique" to obtain the levels of the factor without repetition
+
+```{r}
+unique(hjg$ws.f)
+```
+The line in our code that is splitting the figure in two panels according to the watershed type is "facet_wrap". So, instead of using ws (short for **w**ater**s**hed), we will use ws.f (**f** for factor). The change can be implemented quite easily by adding the layer to our original plot:
+
+```{r}
+ssn_plot <- ssn_plot + facet_wrap(~ws.f)
+ssn_plot
+```
+
+Now, let's reorder the levels of ws.f so the Old-growth appears as the first panel to the left
+
+```{r}
+hjg$ws.f <- factor(hjg$ws.f,levels = c("Old-growth","Logged"))
+```
+
+```{r}
+ssn_plot + facet_wrap(~ws.f)
+```
+
+
+
+
+```{r}
+#Checking season assignment plot
+ssn_plot <- ggplot(hjg, aes(x=uq.cm, color=as.factor(ssn), fill = as.factor (ssn)))+
+  # geom_line(alpha=0.8,size=3.5)+
+  geom_density(alpha = 0.5)+
+  ylab("Kernel density estimate") +
+  xlab("Unit discharge (cm)")+
+  scale_x_log10()+
+  theme_fg +
+  theme (legend.position = c(0.1,0.8))+
   facet_wrap(~ws)
 ssn_plot
 ```
 
-```{r}
-#Checking season assignment plot
-ssn_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ssn)))+
-  geom_line(alpha=0.8,size=3.5)+
-  ylab("Unit discharge (cm)") +
-  xlab("Water day")+
-  theme_fg +
-  facet_wrap(~ws)
-ssn_plot
-```
+
 
 ## Your homework:
 
