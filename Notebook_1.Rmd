@@ -16,9 +16,9 @@ Today, we are going to explore stream flow data. These data span several decades
 ## Setting up
 
 ```{r}
-install.packages(c("lubridate","gridExtra","grid","plyr","dplyr",
-                "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")) 
-# For this line to run, I had to 1) go to Tools -> Global Options -> Packages, and uncheck the box "Use secure download methods for HTTP" and 2) define the list of packages names as a vector by using c("package name 1",...)
+# install.packages(c("lubridate","gridExtra","grid","plyr","dplyr",
+#                 "nlme","doBy","MASS","lsmeans","CarData","utils","cowplot","ggExtra")) 
+# # For this line to run, I had to 1) go to Tools -> Global Options -> Packages, and uncheck the box "Use secure download methods for HTTP" and 2) define the list of packages names as a vector by using c("package name 1",...)
 ```
 
 ## Loading packages
