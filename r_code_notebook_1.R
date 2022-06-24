@@ -1,6 +1,8 @@
 library(ggplot2)
 
 hjg <- read.csv("220621_fho_hjandrews.csv")
+hjg$ws.f <- factor(hjg$ws.f,levels = c("Old-growth","Logged"))
+hjg$ssn <- factor(hjg$ssn,levels = c("Fall","Winter","Spring","Summer"))
 
 theme_fg = theme(axis.text=element_text(colour="black",size=14),
                  axis.title.y = element_text(size = 20),
@@ -17,8 +19,6 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
                  legend.background = element_rect(fill=alpha(0.1)),
                  legend.title = element_blank())
 
-hjg$ws.f <- factor(hjg$ws.f,levels = c("Old-growth","Logged"))
-hjg$ssn <- factor(hjg$ssn,levels = c("Fall","Winter","Spring","Summer"))
 
 uq_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws.f)))+
   geom_line(alpha=0.6, size = 0.8)+# by changing alpha, we change the transparency
@@ -53,4 +53,14 @@ ssn_plot <- ggplot(hjg, aes(x=uq.cm, color=as.factor(ssn), fill = as.factor (ssn
   facet_wrap(~ws.f)
 ssn_plot
 
-ssn_plot <- ssn_plot +   facet_wrap(ws.f~ssn)
+ssn_plot_c <- ggplot(hjg, aes(x=uq.cm, color=as.factor(ws.f), fill = as.factor (ws.f)))+
+  geom_density(alpha = 0.2, size = 1.2)+
+  ylab("Kernel density estimate") +
+  xlab("Unit discharge (cm)")+
+  scale_x_log10()+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  theme_fg +
+  theme(legend.position = c(0.1,0.8))+
+  facet_wrap(~ssn, nrow = 2)
+ssn_plot_c
