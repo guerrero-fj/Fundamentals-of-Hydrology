@@ -46,7 +46,13 @@ Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledg
 
 ## Our Notebooks
 
-Most of our data exploration and analysis will be done in the RStudio environment using R Notebooks. I will provide a Notebook for each session, e.g., streamflow, precipitation, water quality, etc. Most of our assignments will be connected to these Notebooks. These downloable versions are always up to date. 
+Most of our data exploration and analysis will be done in the RStudio environment using R Notebooks. I will provide a Notebook for each session, e.g., streamflow, precipitation, water quality, etc. Most of our assignments will be connected to these Notebooks. The downloable versions below are always up to date. 
 
 * [Notebook 0](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_0.Rmd)
 * [Notebook 1](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_1.Rmd)
+
+### How to access the content of these notebooks:
+1. Click on the link
+2. Once in the corresponding page click on the icon "Copy raw contents" (see below)
+![a screenshot of a code file](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/assets/images/copy_raw_contents.jpg)
+4. Open a new notebook in RStudio and paste the content there. Save this file as dd-mm-yy_notebook_n_last,. For example to have the latest version of Notebook_1 after a class session on June 23, 2022. You would save the file as 23_06_22_notebook_1_last
