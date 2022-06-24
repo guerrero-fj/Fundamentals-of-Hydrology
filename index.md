@@ -1,4 +1,5 @@
-# Welcome to Fundamentals of Hydrology! (Summer 2022)
+# Welcome to Fundamentals of Hydrology! 
+# (Summer 2022)
 
 ## Description:
 
@@ -55,6 +56,6 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 1. Click on the link to the notebook above
 2. Once at the corresponding page click on the icon "Copy raw contents" (see below)
 
-![a screenshot of a code file](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/assets/images/copy_raw_contents.jpg)
+![a screenshot of a code file](https://raw.githubusercontent.com/guerrero-fj/Fundamentals-of-Hydrology/main/assets/images/copy_raw_contents.jpg)
 
 3. Open a new notebook in RStudio and paste the content there. Save this file as dd-mm-yy_notebook_n_last,. For example to have the latest version of Notebook_1 after a class session on June 23, 2022. You would save the file as 23_06_22_notebook_1_last
