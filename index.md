@@ -1,37 +1,52 @@
-## Welcome to GitHub Pages
+# Welcome to Fundamentals of Hydrology! (Summer 2022)
 
-You can use the [editor on GitHub](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Description:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Get familiar with the basic concepts of the science of water. Through this class you will acquire the conceptual and practical tools necessary to become effective water resources professionals in a rapidly changing world.
 
-### Markdown
+## Outcomes:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+At the end of this class you will be able to:
 
-```markdown
-Syntax highlighted code block
+* Perform basic exploratory analysis of water cycle environment in an open-source programming interface.
+* Conduct basic regression analysis of water quality variables in watersheds with contrasting land uses.
+* Present and communicate technical and scientific concepts related to hydrology to non-technical audiences.
 
-# Header 1
-## Header 2
-### Header 3
+## Learning Objectives:
 
-- Bulleted
-- List
+* Knowledge of the techniques for measuring and analyzing hydrologic and water quality data.
+* An understanding of the processes involved in the hydrologic regime and its ecological implications.
+* An understanding of statistical predictive models applied in hydrology and water quality analysis.
+* Cultivate an appreciation for the role of water in linking multiple systems in the landscape.
+* Become familiar with current scientific paradigms guiding cutting-edge research in hydrology.
 
-1. Numbered
-2. List
+## Text:
 
-**Bold** and _Italic_ and `Code` text
+Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledge Fundamentals of Physical Geography. 285 p.
 
-[Link](url) and ![Image](src)
-```
+## Tentative schedule
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+### WEEK 1
+* June 21 - Introduction and prep. work for data analyses
+* June 22 - Streamflow
+* June 23 - Precipitation
+* June 24 - Water quality I: Total Suspended Solids
+### WEEK 2
+* June 28 - Water quality II: Nutrients
+* June 29 - Hydrological processes I: Sediment transport
+* June 30 - Hydrological processes II: Nutrient export
+* July   01 - Predicting stream water quality
+### WEEK 3
+* July 4-9 - Field trip (Dr. Todd Jarvis)
+### WEEK 4
+* July 12 -Paper discussion
+* July 13 - Student presentations I
+* July 14 - Student presentations II
+* July 15 - Final project presentation
 
-### Jekyll Themes
+## Our Notebooks
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Most of our data exploration and analysis will be done in the RStudio environment using R Notebooks. I will provide a Notebook for each session, e.g., streamflow, precipitation, water quality, etc. Most of our assignments will be connected to these Notebooks. These downloable versions are always up to date. 
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+* [Notebook 0](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_0.Rmd)
+* [Notebook 1](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_1.Rmd)
