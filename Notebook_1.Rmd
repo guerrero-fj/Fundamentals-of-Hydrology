@@ -43,9 +43,9 @@ Let's take a look at the raw discharge data.
 
 ```{r}
 uq_plot <- ggplot(hjg, aes(y=uq.cm, x=wd,color=as.factor(ws)))+
-  # geom_point(alpha=0.8,size=3.5)+
-  geom_line(alpha=0.6)+# by changing alpha, we change the transparency
-  geom_smooth(span = 0.15)+# by changing span, I control the wiggles in the trend
+  # geom_point(alpha=0.8,size=0.5)+
+  geom_line(alpha=0.6, size = 0.8)+# by changing alpha, we change the transparency
+  geom_smooth(span = 0.15, se = FALSE)+# by changing span, I control the wiggles in the trend
   ylab("Unit discharge (cm)") +
   xlab("Water day")+
   theme(axis.text=element_text(colour="black",size=14),
@@ -85,7 +85,7 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
         legend.title = element_blank())
 ```
 
-Now, let's add some understandable labels for our watershed treatments. To do so in a way that it is preserved for future plots, we need to modify our dataset "hjg". It turns out that we already have a colum in our data set to do so, it's ws.f (watershed as a factor). You can call for any column in a dataset by using the $ sign.
+Now, let's add some understandable labels for our watershed treatments. To do so in a way that it is preserved for future plots, we need to modify our dataset "hjg". It turns out that we already have a column in our data set to do so, it's ws.f (watershed as a factor). You can call for any column in a dataset by using the $ sign.
 
 ```{r}
 hjg$ws.f
