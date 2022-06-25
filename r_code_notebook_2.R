@@ -46,7 +46,6 @@ hjp_2$SEASON <- getSeason(hjp_2$DATE)
 colnames(hjp_2) <- c("site", "elev","date","p_mm_day","ssn")
 
 
-
 p_select_plot <- ggplot(hjp_2, aes(date, p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
   geom_line()+
   ylab("Total precipitation (daily)")+
@@ -83,3 +82,4 @@ p_select_plot4 <- ggplot(hjp_2r, aes(x = log.p_mm_day, color = as.factor(ssn), f
   facet_wrap(~as.factor(elev), ncol = 4)
 p_select_plot4
 
+#Continue exploring temporal trends of seasonal changes. 
