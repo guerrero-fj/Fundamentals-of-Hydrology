@@ -40,13 +40,13 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
 #Processing dataset
 hjp_0 <- read.csv("220627_hja_precipt.csv")
 hjp_1 <- dplyr::select(hjp_0,c("SITECODE","HEIGHT", "DATE", "PRECIP_TOT_DAY"))
-hjp_2 <- dplyr::filter(hjp_1, HEIGHT != "455")
-hjp_2$DATE <- as.Date(hjp_2$DATE, origin = "1899-12-30", format = "%Y-%m-%d")
-hjp_2$SEASON <- getSeason(hjp_2$DATE)
-colnames(hjp_2) <- c("site", "elev","date","p_mm_day","ssn")
+hjp <- dplyr::filter(hjp_1, HEIGHT != "455")
+hjp$DATE <- as.Date(hjp$DATE, origin = "1899-12-30", format = "%Y-%m-%d")
+hjp$SEASON <- getSeason(hjp$DATE)
+colnames(hjp) <- c("site", "elev","date","p_mm_day","ssn")
 
 
-p_select_plot <- ggplot(hjp_2, aes(date, p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
+p_select_plot <- ggplot(hjp, aes(date, p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
   geom_line()+
   ylab("Total precipitation (daily)")+
   xlab("Year")+
@@ -54,9 +54,9 @@ p_select_plot <- ggplot(hjp_2, aes(date, p_mm_day, color = as.factor(elev), fill
   facet_wrap(~as.factor(elev), ncol = 4)
 p_select_plot
 
-hjp_2$log.p_mm_day <- log10(hjp_2$p_mm_day+1)
+hjp$log.p_mm_day <- log10(hjp$p_mm_day+1)
 
-p_select_plot2 <- ggplot(hjp_2, aes(x = log.p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
+p_select_plot2 <- ggplot(hjp, aes(x = log.p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
   geom_density(alpha = 0.35)+
   xlab("Total precipitation (daily)")+
   ylab("Estimated kernel density")+
@@ -64,7 +64,7 @@ p_select_plot2 <- ggplot(hjp_2, aes(x = log.p_mm_day, color = as.factor(elev), f
   facet_wrap(~as.factor(elev), ncol = 4)
 p_select_plot2
 
-p_select_plot3 <- ggplot(hjp_2, aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
+p_select_plot3 <- ggplot(hjp, aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
   geom_density(alpha = 0.35)+
   xlab("Total precipitation (daily)")+
   ylab("Estimated kernel density")+
@@ -72,10 +72,10 @@ p_select_plot3 <- ggplot(hjp_2, aes(x = log.p_mm_day, color = as.factor(ssn), fi
   facet_wrap(~as.factor(elev), ncol = 4)
 p_select_plot3
 
-hjp_2r <- dplyr::filter(hjp_2,log.p_mm_day > 0)
+hjp_r <- dplyr::filter(hjp,log.p_mm_day > 0)
 
-p_select_plot4 <- ggplot(hjp_2r, aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
-  geom_density(alpha = 0.35)+# perhaps you need to use a kernel density method to account for differences in record lenght.
+p_select_plot4 <- ggplot(hjp_r, aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
+  geom_density(alpha = 0.35)+# perhaps you need to use a kernel density method to account for differences in record length.
   xlab("Total precipitation (daily)")+
   ylab("Estimated kernel density")+
   theme_fg+

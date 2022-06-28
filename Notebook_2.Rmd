@@ -34,7 +34,7 @@ getSeason <- function(DATES){
 #One note: 2012 is a good year to which to convert all of the dates; since it is a leap year, any February 29ths in your data set will be handled smoothly.
 ```
 
- We will also need an overall theme for our graphics (feel free to change the name of the theme-but be consistent accross the code):
+ We will also need an overall theme for our graphics (feel free to change the name of the theme-but be consistent across the code):
  
 ```{r}
 #Defining a common theme for our graphics
@@ -54,12 +54,79 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
                  legend.title = element_blank())
 ```
  
+ Let's now load and prepare the data set:
+ 
+```{r}
+#Processing dataset
+hjp_0 <- read.csv("220627_hja_precipt.csv")
+hjp_1 <- dplyr::select(hjp_0,c("SITECODE","HEIGHT", "DATE", "PRECIP_TOT_DAY"))
+hjp <- dplyr::filter(hjp_1, HEIGHT != "455")
+hjp$DATE <- as.Date(hjp$DATE, origin = "1899-12-30", format = "%Y-%m-%d")
+hjp$SEASON <- getSeason(hjp$DATE)
+colnames(hjp) <- c("site", "elev","date","p_mm_day","ssn")
+```
  
 
+Let's now explore the time series of total daily precipitation across multiple watersheds located at different elevations:
+
+```{r}
+p_select_plot <- ggplot(hjp, aes(date, p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
+  geom_line()+
+  ylab("Total precipitation (daily)")+
+  xlab("Year")+
+  theme_fg+
+  facet_wrap(~as.factor(elev), ncol = 4)
+p_select_plot
+```
+
+ ## **Question**: Which locations (elevations) would be more reliable to estimate long-term trends in precipitation? Why?
+
+One of the challenging aspects of precipitation data is the abundance of zeros and the wide range of variability observed across the record. To better visualize these data, we could use a logarithmic scale. However, we will get errors for zero values, as the log (0) is not defined. So, we will use logarithms, but with a little math trick:
+
+```{r}
+hjp$log.p_mm_day <- log10(hjp$p_mm_day+1)
+```
+
+Let's observe density plots of log-transformed precipt. data
+
+```{r}
+p_select_plot2 <- ggplot(hjp, aes(x = log.p_mm_day, color = as.factor(elev), fill = as.factor(elev)))+
+  geom_density(alpha = 0.35)+
+  xlab("Total precipitation (daily)")+
+  ylab("Estimated kernel density")+
+  theme_fg+
+  facet_wrap(~as.factor(elev), ncol = 4)
+p_select_plot2
+```
+
+ ## **Question**: What kind of probability distribution could be close to these empirical distribution? Are all the distributions exactly equal? Which ones look a bit different? Why do you think so?
+ 
+ Let's observe the distribution of precipitation across the seasons over the years
+ 
+```{r}
+p_select_plot3 <- ggplot(hjp, aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
+  geom_density(alpha = 0.35)+
+  xlab("Total precipitation (daily)")+
+  ylab("Estimated kernel density")+
+  theme_fg+
+  facet_wrap(~as.factor(elev), ncol = 4)
+p_select_plot3
+
+```
+ 
+  ## **Question**: What kind of probability distribution could be close to these empirical distributions per season? Are all the distributions exactly equal? Which ones look a bit different? Why do you think so?
 
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+Let's now take a look at the distribution of precipitation only during rainy days. To do so, let's remove all values = 0.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+```{r}
+p_select_plot4 <- ggplot(dplyr::filter(hjp,log.p_mm_day > 0), 
+                         aes(x = log.p_mm_day, color = as.factor(ssn), fill = as.factor(ssn)))+
+  geom_density(alpha = 0.35)+# perhaps you need to use a kernel density method to account for differences in record length.
+  xlab("Total precipitation (daily)")+
+  ylab("Estimated kernel density")+
+  theme_fg+
+  facet_wrap(~as.factor(elev), ncol = 4)
+p_select_plot4
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
