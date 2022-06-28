@@ -51,6 +51,8 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 
 * [Notebook 0](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_0.Rmd)
 * [Notebook 1](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_1.Rmd)
+* [Notebook_2](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_2.Rmd)
+*   [Precipitation dataset](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/220627_hja_precipt.csv)
 
 ### How to access the content of these notebooks:
 1. Click on the link to the notebook above
