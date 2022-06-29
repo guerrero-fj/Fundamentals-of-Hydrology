@@ -58,7 +58,7 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
  
 ```{r}
 #Processing dataset
-hjp_0 <- read.csv("220627_hja_precipt.csv")
+hjp_0 <- read.csv("220627_hja_precipt_test.csv")
 hjp_1 <- dplyr::select(hjp_0,c("SITECODE","HEIGHT", "DATE", "PRECIP_TOT_DAY"))
 hjp <- dplyr::filter(hjp_1, HEIGHT != "455")
 hjp$DATE <- as.Date(hjp$DATE, origin = "1899-12-30", format = "%Y-%m-%d")
