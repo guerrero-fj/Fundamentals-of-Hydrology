@@ -43,6 +43,11 @@ An even put in a picture (the file image.jpg needs to be in the same folder/dire
 
 ![a conceptual model of the water cycle](water_cycle.jpg)
 
+```{r}
+x = rnorm(1000)
+qplot(x)
+```
+
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
