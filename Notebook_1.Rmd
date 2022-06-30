@@ -2,7 +2,7 @@
 title: "Notebook 1"
 author: "your name"
 date: "June 22, 2022"
-output: word_document
+output: html_notebook
 ---
 
 # Fundamentals of Hydrology: Streamflow
