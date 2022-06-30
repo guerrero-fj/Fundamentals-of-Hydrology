@@ -44,6 +44,17 @@ hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
 hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
 ```
 
+
+```{r}
+hjs$prd <- with(hjs,ifelse(wy<1975,"1969-1974",
+                           ifelse(wy>1974&wy<1981,"1975-1980",
+                                  ifelse(wy>1980&wy<1987,"1981-1986",
+                                         ifelse(wy>1986&wy<1993,"1987-1992", 
+                                                ifelse(wy>1992&wy<1999,"1993-1998",
+                                                       ifelse(wy>1998&wy<2005,"1999-2004",
+                                                            ifelse(wy>2004&wy<2011,"2005-2010","2011+"))))))))
+```
+
 In this dataset, Total Suspended Solids (TSS) is represented by the variable "sed.mg_l" in which mg_l is the concentration unit (miligrams per litter). Let's start with a quick look of the time series:
 
 ## Suspended sediments over time
@@ -122,7 +133,7 @@ Let's compare both watersheds season by season
 ```{r}
 ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
   # geom_histogram(alpha = 0.5)+
-  geom_density(alpha = 0.5, size = 1.25)+
+  geom_density(alpha = 0.5, size = 0.75)+
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
     labels = trans_format("log10", math_format(10^.x)))+
   ylab("Estimated Kernel Density")+
@@ -134,3 +145,34 @@ ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
 ssn_tss_fig
 ```
 
+Finally, let's take a look along a moving temporal window:
+
+```{r}
+ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~prd,ncol = 4)+
+  theme_fg
+ssn_tss_fig
+```
+
+```{r}
+ssn_uqm_fig <- ggplot(hjs, aes(x=uq.cm, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab("Unit discharge (cm)")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~prd,ncol = 4)+
+  theme_fg
+ssn_uqm_fig
+```
