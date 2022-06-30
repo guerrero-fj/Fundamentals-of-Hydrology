@@ -32,7 +32,6 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
                  legend.background = element_rect(fill=alpha(0.1)),
                  legend.title = element_blank())
 ```
- 
 
 # Fundamentals of Hydrology: Erosion and Sediment Transport
 
@@ -40,7 +39,7 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
 
 ### Erosion and sediment transport
 
-**Question**: What is erosion, and how is it related to sediment transport in streams? 
+**Question**: What is erosion, and how is it related to sediment transport in streams?
 
 **Question**: How is particulate material supplied to stream channels in mountainous headwater streams?
 
@@ -48,7 +47,7 @@ Today, we are going to explore suspended sediment data. These data span several 
 
 We will use the same data set analyzed in the stream flow section.
 
-**To do**: Visit the [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) website and find the appropriate form the data set used in our class. 
+**To do**: Visit the [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) website and find the appropriate form the data set used in our class.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Loading the data and making some internal arrangement
@@ -77,11 +76,11 @@ In this dataset, Total Suspended Solids (TSS) is represented by the variable "se
 ```{r echo=FALSE, message=FALSE, warning = FALSE}
 dat_tss_fig <- ggplot(hjs, aes(y=sed.mg_l, x= dt, color = ws.f, fill = ws.f))+
   geom_line(alpha=0.5)+
-  # geom_point(alpha = 0.5)+
-  geom_smooth(span = 0.35)+
+  geom_point(alpha = 0.5)+
+  # geom_smooth(span = 0.35)+
   scale_x_date()+
-  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-    labels = trans_format("log10", math_format(10^.x)))+ #the function trans_breaks comes with the package scales
+  # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+  #   labels = trans_format("log10", math_format(10^.x)))+ #the function trans_breaks comes with the package scales
   xlab("Water year")+
   ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
   scale_color_manual(values = c("#00BFC4","#F8766D"))+
@@ -172,7 +171,6 @@ ssn_tss_fig
 
 Let's first take a look at the TSS distributions in 5-year increments:
 
-
 ```{r echo=FALSE, message=FALSE, warning = FALSE}
 prd_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
   # geom_histogram(alpha = 0.5)+
@@ -191,7 +189,6 @@ prd_tss_fig
 
 Let's take a similar look at discharge data:
 
-
 ```{r echo=FALSE, message=FALSE, warning = FALSE}
 prd_uqm_fig <- ggplot(hjs, aes(x=uq.cm, color = ws.f, fill = ws.f))+
   # geom_histogram(alpha = 0.5)+
@@ -206,15 +203,14 @@ prd_uqm_fig <- ggplot(hjs, aes(x=uq.cm, color = ws.f, fill = ws.f))+
   theme_fg
 prd_uqm_fig
 ```
- 
- Let's now calculate sediment load:
- 
+
+Let's now calculate sediment load:
+
 ```{r}
  hjs$sed_kg_ha <- (hjs$uq.cm * hjs$sed.mg_l)/10
 ```
- 
-Finally, let's take a look at the temporal evolution of the sediment load:
 
+Finally, let's take a look at the temporal evolution of the sediment load:
 
 ```{r echo=FALSE, message=FALSE, warning = FALSE}
 prd_sld_fig <- ggplot(hjs, aes(x=sed_kg_ha, color = ws.f, fill = ws.f))+
@@ -230,4 +226,4 @@ prd_sld_fig <- ggplot(hjs, aes(x=sed_kg_ha, color = ws.f, fill = ws.f))+
 prd_sld_fig
 ```
 
- *To do*: add a caption to the figure and compare the density distribution of Sediment loads between watersheds and across time periods.
+*To do*: add a caption to the figure and compare the density distribution of Sediment loads between watersheds and across time periods.
