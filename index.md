@@ -54,6 +54,7 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 * [Notebook_2](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_2.Rmd)
 *   [Precipitation dataset](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/220627_hja_precipt.csv)
 * [Notebook_3](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_3.Rmd)
+* Erosion and Sediment Transport [MURAL](https://app.mural.co/t/oregonstate7865/m/oregonstate7865/1656544423986/dc3ebd262ce741ac1e6fd91caf6d254658de66a0?sender=uaa06939fbabfc43444e21792)
 
 ### How to access the content of these notebooks:
 1. Click on the link to the notebook above
