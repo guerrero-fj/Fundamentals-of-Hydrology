@@ -5,15 +5,13 @@ date: "June 30, 2022"
 output: html_notebook
 ---
 
-Setting up (to be hidden from final version)
-
-
-```{r echo=FALSE,message=FALSE, warning=FALSE}
+```{r include=FALSE}
+#Setting up (to be hidden from final version)
 library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(scales)
-#echo=FALSE, message=FALSE hide both the code ouput and the message from the 
+#echo=FALSE, message=FALSE hide both the code output and the message from the 
 #html version
 ```
 
@@ -60,8 +58,9 @@ hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
 hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
 ```
 
+Here, I am creating 5-year time windows for part of our analysis later.
 
-```{r echo=FALSE,message=FALSE}
+```{r include=FALSE}
 hjs$prd <- with(hjs,ifelse(wy<1975,"1969-1974",
                            ifelse(wy>1974&wy<1981,"1975-1980",
                                   ifelse(wy>1980&wy<1987,"1981-1986",
@@ -75,7 +74,7 @@ In this dataset, Total Suspended Solids (TSS) is represented by the variable "se
 
 ### Suspended sediments over time
 
-```{r echo=FALSE,message=FALSE, warning = FALSE}
+```{r echo=FALSE, message=FALSE, warning = FALSE}
 dat_tss_fig <- ggplot(hjs, aes(y=sed.mg_l, x= dt, color = ws.f, fill = ws.f))+
   geom_line(alpha=0.5)+
   # geom_point(alpha = 0.5)+
@@ -231,4 +230,4 @@ prd_sld_fig <- ggplot(hjs, aes(x=sed_kg_ha, color = ws.f, fill = ws.f))+
 prd_sld_fig
 ```
 
- 
+ *To do*: add a caption to the figure and compare the density distribution of Sediment loads between watersheds and across time periods.
