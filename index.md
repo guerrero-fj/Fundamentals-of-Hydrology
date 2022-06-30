@@ -25,22 +25,22 @@ At the end of this class you will be able to:
 
 Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledge Fundamentals of Physical Geography. 285 p.
 
-## Tentative schedule (Expected | Delivered)
+## Tentative schedule (Expected | *Delivered*)
 
 ### WEEK 1
 * June 21 - Introduction and prep. work for data analyses
-* June 22 - Streamflow | Notebook 0
-* June 23 - Precipitation | Streamflow
-* June 24 - Water quality I: Total Suspended Solids | Notebook 1
+* June 22 - Streamflow (*Notebook 0*)
+* June 23 - Precipitation (*Streamflow*)
+* June 24 - Water quality I: Total Suspended Solids (*Notebook 1*)
 ### WEEK 2
-* June 28 - Water quality II: Nutrients | Precipitation
-* June 29 - Hydrological processes I: Sediment transport 
-* June 30 - Hydrological processes II: Nutrient export
-* July 01 - Predicting stream water quality
+* June 28 - Water quality II: Nutrients (*Precipitation*)
+* June 29 - Hydrological processes I: Sediment transport (*Notebook 2*)
+* June 30 - Hydrological processes II: Nutrient export (*Sediment transport*)
+* July 01 - Predicting stream water quality (*Nutrient export*)
 ### WEEK 3
 * July 4-9 - Field trip (Dr. Todd Jarvis)
 ### WEEK 4
-* July 12 -Paper discussion
+* July 12 - Paper discussion
 * July 13 - Student presentations I | Predicting stream water quality
 * July 14 - Student presentations II | Student presentations
 * July 15 - Final project presentation
