@@ -4,6 +4,9 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(scales)
+library(GGally)
+
+#You need to install GGally package
 
 
 theme_fg = theme(axis.text=element_text(colour="black",size=14),
@@ -22,3 +25,25 @@ theme_fg = theme(axis.text=element_text(colour="black",size=14),
                  legend.title = element_blank())
 
 dat <- hjs
+
+p_dat <- dplyr::select(dat,ws.f,dt,ssn,prd,log.uq,log.sed.mg_l,log.slc.mg_l,log.ptn.mg_l,log.doc.mg_l)
+
+require(GGally)
+my_fn <- function(data,mapping, method="loess",...){
+  p <- ggplot(data = data, mapping = mapping) +
+    geom_point() +
+    geom_smooth(method=method, ...)
+  p
+}
+
+p <- ggpairs(p_dat, columns = 5:9, ggplot2::aes(colour = ws.f, alpha = 0.6),
+             lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow){
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j]+
+      scale_fill_manual(values= c("#00BFC4","#F8766D"))+
+      scale_color_manual(values= c("#00BFC4","#F8766D"))
+  }
+}
+p
+
