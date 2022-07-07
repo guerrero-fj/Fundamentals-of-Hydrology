@@ -79,8 +79,8 @@ dat_tss_fig <- ggplot(hjs, aes(y=sed.mg_l, x= dt, color = ws.f, fill = ws.f))+
   geom_point(alpha = 0.5)+
   # geom_smooth(span = 0.35)+
   scale_x_date()+
-  # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-  #   labels = trans_format("log10", math_format(10^.x)))+ #the function trans_breaks comes with the package scales
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+ #the function trans_breaks comes with the package scales
   xlab("Water year")+
   ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
   scale_color_manual(values = c("#00BFC4","#F8766D"))+
@@ -132,7 +132,7 @@ hist_tss_fig
 
 *To do*: add a caption to the figure and compare the density distribution of TSS concentrations between watersheds.
 
-### Seasonan changes in the distribution of TSS concentrations in and Old-growth and logged watershed in the Oregon Cascades
+### Seasonal changes in the distribution of TSS concentrations in and Old-growth and logged watershed in the Oregon Cascades
 
 ```{r echo=FALSE, message=FALSE, warning = FALSE}
 ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ssn, fill = ssn))+
