@@ -40,10 +40,10 @@ Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledg
 ### WEEK 3
 * July 4-9 - Field trip (Dr. Todd Jarvis)
 ### WEEK 4
-* July 12 - Paper discussion
-* July 13 - Student presentations I | Predicting stream water quality
-* July 14 - Student presentations II | Student presentations
-* July 15 - Final project presentation
+* July 12 - Paper discussion (*Predicting stream water quality*)
+* July 13 - Student presentations (*Paper discussion)
+* July 14 - Student presentations I | Student presentations
+* July 15 - Student presentations II, including Final project presentation
 
 ## Our Notebooks
 
@@ -63,3 +63,8 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 ![a screenshot of a code file](https://raw.githubusercontent.com/guerrero-fj/Fundamentals-of-Hydrology/main/assets/images/copy_raw_contents.jpg)
 
 3. Open a new notebook in RStudio and paste the content there. Save this file as dd-mm-yy_notebook_n_last,. For example to have the latest version of Notebook_1 after a class session on June 23, 2022. You would save the file as 23_06_22_notebook_1_last
+
+### Paper discussion
+For our paper discussion we will read the article by Battin (2009); The Boundless Carbon Cycle. You can download the paper through OSU library. You can also download a copy from the class repository [here](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/battin_09_boundless_c_cycle.pdf)
+
+Please note that according to our schedule we will have this discussion on Wednesday **July 13**
