@@ -1,5 +1,5 @@
 ---
-title: "Notebook 4: Modeling Stream Water Quality"
+title: "Notebook 4: Modeling Stream Biogeochemistry"
 author: "your name"
 date: "July 12, 2022"
 output: html_notebook
@@ -46,11 +46,11 @@ hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
 hjm <- dplyr::filter(hjs,wy>1983)
 ```
 
-# Fundamentals of Hydrology: Erosion and Sediment Transport
+# Fundamentals of Hydrology: Modeling stream biogeochemistry
 
 ## Introduction
 
-### Erosion and sediment transport
+### Stream Biogeochemistry
 
 **Question**: What is erosion, and how is it related to sediment transport in streams?
 
