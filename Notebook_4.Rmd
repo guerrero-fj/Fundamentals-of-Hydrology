@@ -1,0 +1,242 @@
+---
+title: "Notebook 4: Modeling Stream Water Quality"
+author: "your name"
+date: "July 12, 2022"
+output: html_notebook
+---
+
+```{r include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(scales)
+library(GGally)
+```
+
+```{r echo=FALSE, message=FALSE, warning= FALSE}
+#Theme for plots
+theme_fg = theme(axis.text=element_text(colour="black",size=14),
+                 axis.title.y = element_text(size = 20),
+                 axis.title.x = element_text(size = 20),
+                 panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
+                 panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
+                 panel.border = element_rect(fill=NA, colour = "black", size=1),
+                 panel.background=element_blank(),
+                 axis.ticks.length = unit(0.254, "cm"),
+                 axis.ticks = element_line(colour = "black", size=1), 
+                 axis.line = element_line(colour = "black"),
+                 legend.position = c(.90,.90),
+                 legend.direction = "vertical",
+                 legend.background = element_rect(fill=alpha(0.1)),
+                 legend.title = element_blank())
+
+#Multiplot function for GGally
+my_fn <- function(data,mapping, method="loess",...){
+  p <- ggplot(data = data, mapping = mapping) +
+    geom_point() +
+    geom_smooth(method=method, ...)
+  p
+}
+
+#Loading the data and making some internal arrangement
+hjs <- read.csv("220621_fho_hjandrews.csv")
+hjs$dt <- as.Date(hjs$dt, origin = "1899-12-30", format = "%Y-%m-%d")
+hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
+hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
+hjm <- dplyr::filter(hjs,wy>1983)
+```
+
+# Fundamentals of Hydrology: Erosion and Sediment Transport
+
+## Introduction
+
+### Erosion and sediment transport
+
+**Question**: What is erosion, and how is it related to sediment transport in streams?
+
+**Question**: How is particulate material supplied to stream channels in mountainous headwater streams?
+
+Today, we are going to explore suspended sediment data. These data span several decades and are part of a Long Term Ecological Research Forest in Oregon. The [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) is located in the Oregon Cascades. But before looking at these data, we need to load some packages that we installed in the previous session
+
+We will use the same data set analyzed in the stream flow section.
+
+**To do**: Visit the [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) website and find the appropriate form the data set used in our class.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#Loading the data and making some internal arrangement
+hjs <- read.csv("220621_fho_hjandrews.csv")
+hjs$dt <- as.Date(hjs$dt, origin = "1899-12-30", format = "%Y-%m-%d")
+hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
+hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
+```
+
+Here, I am creating 5-year time windows for part of our analysis later.
+
+```{r include=FALSE}
+hjs$prd <- with(hjs,ifelse(wy<1975,"1969-1974",
+                           ifelse(wy>1974&wy<1981,"1975-1980",
+                                  ifelse(wy>1980&wy<1987,"1981-1986",
+                                         ifelse(wy>1986&wy<1993,"1987-1992", 
+                                                ifelse(wy>1992&wy<1999,"1993-1998",
+                                                       ifelse(wy>1998&wy<2005,"1999-2004",
+                                                            ifelse(wy>2004&wy<2011,"2005-2010","2011+"))))))))
+```
+
+In this dataset, Total Suspended Solids (TSS) is represented by the variable "sed.mg_l" in which mg_l is the concentration unit (miligrams per litter). Let's start with a quick look of the time series:
+
+### Suspended sediments over time
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+dat_tss_fig <- ggplot(hjs, aes(y=sed.mg_l, x= dt, color = ws.f, fill = ws.f))+
+  geom_line(alpha=0.5)+
+  geom_point(alpha = 0.5)+
+  # geom_smooth(span = 0.35)+
+  scale_x_date()+
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+ #the function trans_breaks comes with the package scales
+  xlab("Water year")+
+  ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~ws.f)+
+  theme_fg
+dat_tss_fig
+```
+
+*To do*: Add a caption to the figure and describe the changes observed over time.
+
+### Suspended sediment concentrations along the hydrological year (Oct 1 - Sept 30)
+
+```{r echo=FALSE,message=FALSE, warning = FALSE}
+day_tss_fig <- ggplot(hjs, aes(y=sed.mg_l, x= wd, color = ws.f, fill = ws.f))+
+  geom_line(alpha=0.5)+
+  # geom_point(alpha = 0.5)+
+  geom_smooth(span = 0.35)+
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  xlab("Water day")+
+  ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~ws.f)+
+  theme_fg
+day_tss_fig
+```
+
+*To do*: Add a caption to the figure and describe the changes observed over time.
+
+### Distribution of TSS concentrations in and Old-growth and logged watershed in the Oregon Cascades
+
+```{r echo=FALSE,message=FALSE, warning = FALSE}
+hist_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  # ylab("Frequency")+
+  ylab("Estimated kernel density")+
+  xlab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  # facet_wrap(~ws.f)+
+  theme_fg
+hist_tss_fig
+```
+
+*To do*: add a caption to the figure and compare the density distribution of TSS concentrations between watersheds.
+
+### Seasonal changes in the distribution of TSS concentrations in and Old-growth and logged watershed in the Oregon Cascades
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ssn, fill = ssn))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5)+
+  scale_x_log10()+
+  ylab("Estimated kernel density")+
+  xlab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  facet_wrap(~ws.f)+
+  theme_fg
+ssn_tss_fig
+```
+
+Let's compare both watersheds season by season
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+ssn_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~ssn)+
+  theme_fg
+ssn_tss_fig
+```
+
+*To do*: add a caption to the figure and compare the density distribution of TSS concentrations between watersheds.
+
+### Temporal evolution in the Suspended sediment load in heawater streams in the Oregon Cascades
+
+Let's first take a look at the TSS distributions in 5-year increments:
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+prd_tss_fig <- ggplot(hjs, aes(x=sed.mg_l, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.5, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~prd,ncol = 4)+
+  theme_fg+
+  theme(legend.position = c(0.08,0.9))
+prd_tss_fig
+```
+
+Let's take a similar look at discharge data:
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+prd_uqm_fig <- ggplot(hjs, aes(x=uq.cm, color = ws.f, fill = ws.f))+
+  # geom_histogram(alpha = 0.5)+
+  geom_density(alpha = 0.65, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab("Unit discharge (cm)")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~prd,ncol = 4)+
+  theme_fg
+prd_uqm_fig
+```
+
+Let's now calculate sediment load:
+
+```{r}
+ hjs$sed_kg_ha <- (hjs$uq.cm * hjs$sed.mg_l)/10
+```
+
+Finally, let's take a look at the temporal evolution of the sediment load:
+
+```{r echo=FALSE, message=FALSE, warning = FALSE}
+prd_sld_fig <- ggplot(hjs, aes(x=sed_kg_ha, color = ws.f, fill = ws.f))+
+  geom_density(alpha = 0.65, size = 0.75)+
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  ylab("Estimated Kernel Density")+
+  xlab(expression(paste("Sediment load (kg", ha^{-1}, ")")))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"))+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"))+
+  facet_wrap(~prd,ncol = 4)+
+  theme_fg
+prd_sld_fig
+```
+
+*To do*: add a caption to the figure and compare the density distribution of Sediment loads between watersheds and across time periods.
