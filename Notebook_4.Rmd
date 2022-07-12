@@ -105,7 +105,7 @@ doc_don <- ggplot(hjm,aes(x=as.Date(dt),y=don.mg_l, color = ws.f, fill = ws.f))+
   facet_wrap(~ws.f)
 doc_don
 ```
-**To do:** Add captions to the figures above and describe how representative are the doc samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
+**To do:** Add captions to the figures above and describe how representative are the DOC samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
 
 ### Predicting Dissolved Organic Carbon in Headwater streams
 
@@ -254,6 +254,15 @@ obs_prd_doc <- ggplot(hjm, aes(x=doc.mg_l,y=p.doc.mg_l,color = ws.f))+
 obs_prd_doc 
 ```
 
+```{r}
+doc_res_all <- ggplot(doc_mod, aes(x = doc_mod$fitted.values, y = doc_mod$residuals))+
+  # geom_density(alpha = 0.5)+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  xlab("Residuals = Observed - Predicted DOC")+
+  ylab("Estimated kernel density")
+doc_res_all
+```
 
 
 
