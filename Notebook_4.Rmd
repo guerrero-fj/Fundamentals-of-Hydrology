@@ -105,15 +105,15 @@ doc_don <- ggplot(hjm,aes(x=as.Date(dt),y=don.mg_l, color = ws.f, fill = ws.f))+
   facet_wrap(~ws.f)
 doc_don
 ```
-*To do:* Add captions to the figures above and describe how representative are the doc samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
+**To do:** Add captions to the figures above and describe how representative are the doc samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
 
 ### Predicting Dissolved Organic Carbon in Headwater streams
 
 Our selection of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen in the plots above is not random. All of this variables affect the concentrations of DOC directly or indirectly. 
 
-*To do*: Look for examples of relationships between Q, TSS, DSi, and DON with DOC in headwater streams in the literature. Write a short paragraph (no more than 4 sentences about each of the relationships-please include the bibliographic reference)
+**To do**: Look for examples of relationships between Q, TSS, DSi, and DON with DOC in headwater streams in the literature. Write a short paragraph (no more than 4 sentences about each of the relationships-please include the bibliographic reference)
 
-Let's now explore these relationships in our dataset:
+Let's now explore these relationships in our data set:
 
 ```{r echo=FALSE, message=FALSE, warning = FALSE, results='hide', fig.keep='all'}
 require(GGally)
@@ -131,7 +131,36 @@ for(i in 1:p$nrow){
 }
 p
 ```
+**To do**: Add a caption to the figure and compare the relationships observed between DOC and other variables across forest types. Also, how do these relationships compared with what has been reported in the literature?
 
+The correlation coefficients calculated above, are not independent from each other. That is, the effect of the other variables has not been accounted for before estimating $r^2$ values. If we wanted to predict DOC concentrations based on this relationships, our starting point would be to build simple linear regression models.
+
+**Question**: What does it mean "regression" in the context of statistical analyses?
+
+A simple linear regression model is expressed as
+
+y = $\beta_0$ + $\beta_1$*x + $\epsilon$
+
+
+Where:
+y = response variable (the one we are interested in predicting, in our case DOC)
+x = predictor (the variable we are using to predict the response, e.g., Q, or TSS, or DSi)
+$\beta_0$ = Intercept (the value of our response variable when the predictor = 0)
+$\beta_1$ = Slope (the rate of change of our response variable per unit change in our predictor)
+
+
+Let's start with a simple linear regression of DOC against Q:
+
+```{r}
+uq_model = lm(log.doc.mg_l~log.uq + ws.f, hjm)
+summary(uq_model)
+res_plot <- ggplot(uq_model, aes(uq_model$residuals, uq_model$fitted.values))+
+  geom_point()
+res_plot
+```
+
+uq_model = lm(log.doc.mg_l~log.uq, hjm)
+summary(uq_model)
 
 
 
