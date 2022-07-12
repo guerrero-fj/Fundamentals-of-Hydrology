@@ -14,21 +14,6 @@ library(GGally)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning= FALSE}
-#Theme for plots
-theme_fg = theme(axis.text=element_text(colour="black",size=14),
-                 axis.title.y = element_text(size = 20),
-                 axis.title.x = element_text(size = 20),
-                 panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
-                 panel.grid.major = element_line(colour = "gray", linetype = "dashed"),
-                 panel.border = element_rect(fill=NA, colour = "black", size=1),
-                 panel.background=element_blank(),
-                 axis.ticks.length = unit(0.254, "cm"),
-                 axis.ticks = element_line(colour = "black", size=1), 
-                 axis.line = element_line(colour = "black"),
-                 legend.position = c(.90,.90),
-                 legend.direction = "vertical",
-                 legend.background = element_rect(fill=alpha(0.1)),
-                 legend.title = element_blank())
 
 #Multiplot function for GGally
 my_fn <- function(data,mapping, method="loess",...){
@@ -52,35 +37,104 @@ hjm <- dplyr::filter(hjs,wy>1983)
 
 ### Stream Biogeochemistry
 
-**Question**: What is erosion, and how is it related to sediment transport in streams?
+**Question**: Explain how the water and carbon cycle are interconnected in streams and rivers?
 
-**Question**: How is particulate material supplied to stream channels in mountainous headwater streams?
+**Question**: Describe the main forms in which carbon moves in streams and rivers.
 
-Today, we are going to explore suspended sediment data. These data span several decades and are part of a Long Term Ecological Research Forest in Oregon. The [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) is located in the Oregon Cascades. But before looking at these data, we need to load some packages that we installed in the previous session
+Today, we are going to explore bio-geochemical data. These data span several decades and are part of a Long Term Ecological Research Forest in Oregon. The [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) is located in the Oregon Cascades. But before looking at these data, we need to load some packages that we installed in the previous session
 
 We will use the same data set analyzed in the stream flow section.
 
-**To do**: Visit the [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) website and find the appropriate form the data set used in our class.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#Loading the data and making some internal arrangement
-hjs <- read.csv("220621_fho_hjandrews.csv")
-hjs$dt <- as.Date(hjs$dt, origin = "1899-12-30", format = "%Y-%m-%d")
-hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
-hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
+Our target variable for this analysis will be Dissolved Organic Carbon (DOC), let's take a look at the sampling conditions as related to discharge, suspended sediments, and dissolved silica (non-reactive tracer).
+
+#### Dissolved Organic Carbon Samples and Discharge
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_uq_ts <- ggplot(hjm,aes(x=as.Date(dt),y=uq.cm, color = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=uq.cm))+
+  xlab("Water year")+
+  ylab("Unit discharge (cm)")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  facet_wrap(~ws.f)
+doc_uq_ts
 ```
 
-Here, I am creating 5-year time windows for part of our analysis later.
+#### Dissolved Organic Carbon sampling and Total Suspended Solids
 
-```{r include=FALSE}
-hjs$prd <- with(hjs,ifelse(wy<1975,"1969-1974",
-                           ifelse(wy>1974&wy<1981,"1975-1980",
-                                  ifelse(wy>1980&wy<1987,"1981-1986",
-                                         ifelse(wy>1986&wy<1993,"1987-1992", 
-                                                ifelse(wy>1992&wy<1999,"1993-1998",
-                                                       ifelse(wy>1998&wy<2005,"1999-2004",
-                                                            ifelse(wy>2004&wy<2011,"2005-2010","2011+"))))))))
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_tss <- ggplot(hjm,aes(x=as.Date(dt),y=sed.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=sed.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  xlab("Water year")+
+  ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_tss
 ```
+
+#### Dissolved Organic Carbon sampling and Dissolved Silica
+
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_slc <- ggplot(hjm,aes(x=as.Date(dt),y=slc.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=slc.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Silica (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_slc
+```
+
+#### Dissolved Organic Carbon sampling and Dissolved Organic Nitrogen
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_don <- ggplot(hjm,aes(x=as.Date(dt),y=don.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=don.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Organic Nitrogen (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_don
+```
+*To do:* Add captions to the figures above and describe how representative are the doc samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
+
+### Predicting Dissolved Organic Carbon in Headwater streams
+
+Our selection of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen in the plots above is not random. All of this variables affect the concentrations of DOC directly or indirectly. 
+
+*To do*: Look for examples of relationships between Q, TSS, DSi, and DON with DOC in headwater streams in the literature. Write a short paragraph (no more than 4 sentences about each of the relationships-please include the bibliographic reference)
+
+Let's now explore these relationships in our dataset:
+
+```{r echo=FALSE, message=FALSE, warning = FALSE, results='hide', fig.keep='all'}
+require(GGally)
+
+p_dat <- dplyr::select(hjm,ws.f,dt,ssn,log.uq,log.sed.mg_l,log.slc.mg_l,log.don.mg_l,log.doc.mg_l)
+
+p <- ggpairs(p_dat, columns = 4:8, ggplot2::aes(colour = ws.f, alpha = 0.6),
+             lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow){
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j]+
+      scale_fill_manual(values= c("#00BFC4","#F8766D"))+
+      scale_color_manual(values= c("#00BFC4","#F8766D"))
+  }
+}
+p
+```
+
+
+
+
 
 In this dataset, Total Suspended Solids (TSS) is represented by the variable "sed.mg_l" in which mg_l is the concentration unit (miligrams per litter). Let's start with a quick look of the time series:
 
