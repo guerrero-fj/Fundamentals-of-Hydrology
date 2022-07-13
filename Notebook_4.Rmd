@@ -11,6 +11,8 @@ library(dplyr)
 library(lubridate)
 library(scales)
 library(GGally)
+library(viridis)#Make sure you have this package installed before running chunks
+library(colorBlindness)#and this one too!
 ```
 
 ```{r echo=FALSE, message=FALSE, warning= FALSE}
@@ -22,6 +24,11 @@ my_fn <- function(data,mapping, method="loess",...){
     geom_smooth(method=method, ...)
   p
 }
+
+#Kernel density estimation function
+bwf <- function(x){bw.SJ(x)} #Sheather and Jones (1991)
+
+
 
 #Loading the data and making some internal arrangement
 hjs <- read.csv("220621_fho_hjandrews.csv")
@@ -160,7 +167,7 @@ Let's take a look at the residuals:
 
 ```{r}
 res_plot <- ggplot(uq_model, aes(x= uq_model$residuals, color = ws.f, fill = ws.f))+
-  geom_density(alpha = 0.5)+
+  geom_density(bw=0.085, alpha = 0.5)+
   geom_vline(xintercept = 0)+
   facet_wrap(~ws.f, scales = "free_x")+
   xlab("Residuals = Observed - Predicted DOC")+
@@ -181,7 +188,7 @@ Let's take a look at the residuals again:
 
 ```{r}
 dsi_res_plot <- ggplot(uq_model, aes(x=dsi_model$residuals, color = ws.f, fill = ws.f))+
-  geom_density(alpha = 0.5)+
+  geom_density(bw=.085,alpha = 0.5)+
   geom_vline(xintercept = 0)+
   facet_wrap(~ws.f, scales = "free_x")+
   xlab("Residuals = Observed - Predicted DOC")+
@@ -192,6 +199,7 @@ dsi_res_plot
 ```
 Let's build now a regression model including both Q and DSi
 
+
 ```{r}
 m_model_0 <- lm(log.doc.mg_l~log.uq+log.slc.mg_l+ws.f, hjm)
 summary(m_model_0)
@@ -201,7 +209,7 @@ Let's look at the residuals:
 
 ```{r}
 m0_res_plot <- ggplot(m_model_0, aes(x =m_model_0$residuals, color = ws.f, fill = ws.f))+
-  geom_density(alpha = 0.5)+
+  geom_density(bw=0.085, alpha = 0.5)+
   geom_vline(xintercept = 0)+
   facet_wrap(~ws.f, scales = "free_x")+
   xlab("Residuals = Observed - Predicted DOC")+
@@ -214,25 +222,24 @@ m0_res_plot
 Let's add all our predictor variables:
 
 ```{r}
-doc_mod <- lm(log.doc.mg_l ~ log.uq + log.sed.mg_l + (log.slc.mg_l + log.don.mg_l) * ssn + ws.f, 
-              data = dplyr::filter(hjm,is.na(hjm$doc.mg_l)==FALSE))
+doc_mod <- lm(log.doc.mg_l ~ log.uq + q.cv + log.ptm + pt.cv + log.sed.mg_l + (log.slc.mg_l + log.don.mg_l) * ssn + ws.f + log.utn.mg_l, data = dplyr::filter(hjm,is.na(hjm$doc.mg_l)==FALSE))
 summary(doc_mod)
 ```
 And explore the residuals:
 
 ```{r}
 doc_res_plot <- ggplot(doc_mod, aes(x = doc_mod$residuals, color = ws.f, fill = ws.f))+
-  geom_density(alpha = 0.5)+
+  geom_density(bw = 0.05, alpha = 0.5)+
   geom_vline(xintercept = 0)+
-  facet_wrap(~ws.f, scales = "free_x")+
   xlab("Residuals = Observed - Predicted DOC")+
   ylab("Estimated kernel density")+
   scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
-  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  facet_wrap(~ws.f)
 doc_res_plot
 ```
 
-Let's now predict DOC across our entire dataset:
+Let's now predict DOC across our entire data set:
 
 ```{r}
 hjm$p.doc.mg_l <- exp(predict.lm(doc_mod,newdata = hjm,na.action = na.pass))
@@ -244,28 +251,127 @@ hjm$log.p.doc.mg_l <- log10(hjm$p.doc.mg_l)
 And let's take a look at the observed vs. predicted relationship
 
 ```{r}
-obs_prd_doc <- ggplot(hjm, aes(x=doc.mg_l,y=p.doc.mg_l,color = ws.f))+
-  geom_point()+
+obs_prd_doc <- ggplot(hjm, aes(x=doc.mg_l,y=p.doc.mg_l,color = ws.f, size =p.doc.mg_l))+
+  geom_point(alpha = 0.5)+
   geom_abline()+
-  scale_fill_manual(values= c("#00BFC4","#F8766D"), name = "Forest type")+
-  scale_color_manual(values= c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_size(name= expression(paste("Pred. DOC (mg",l^{-1}, ")")))+
   xlab("Observed DOC")+
-  ylab("Predicted DOC")
+  ylab("Predicted DOC")+
+  facet_wrap(~ws.f)
 obs_prd_doc 
 ```
 
 ```{r}
-doc_res_all <- ggplot(doc_mod, aes(x = doc_mod$fitted.values, y = doc_mod$residuals))+
+doc_res_all <- ggplot(doc_mod, aes(x = doc_mod$fitted.values, y = doc_mod$residuals, color = ws.f))+
   # geom_density(alpha = 0.5)+
   geom_point()+
   geom_hline(yintercept = 0)+
-  xlab("Residuals = Observed - Predicted DOC")+
-  ylab("Estimated kernel density")
+  scale_color_manual(values= c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Predicted values")+
+  ylab("Residuals = Observed DOC - Predicted DOC")+
+  facet_wrap(~ws.f, scales="free_x")
 doc_res_all
 ```
+Let's take a look at the entire time series for DOC and the observed values
+
+```{r}
+pdoc_ts <- ggplot(hjm,aes(x=as.Date(dt),y=p.doc.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=doc.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Organic Carbon (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+pdoc_ts
+```
+### Processes affecting Dissolved Organic Carbon concentrations in Headwater streams
+
+In our model, we have formally tested hypothesis about the relationship between DOC and multiple variables (Q, P, TSS, Seasonality, etc.). Now is time to use our reconstructed historical time series to explore different processes affecting DOC concentrations in headwater streams. 
+
+#### Seasonality
+
+```{r}
+ssn_pdoc <- ggplot(hjm, aes(x=p.doc.mg_l, color = ssn, fill = ssn))+
+  geom_density(bw = 0.2,alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_fill_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  xlab(expression(paste("Predicted DOC (mg",l^{-1}, ")")))+
+  ylab("Estimated Kernel Density")+
+  facet_wrap(~ws.f)
+ssn_pdoc
+```
+**To do**: Add a caption to the figure and describe the differences in doc seasonal behavior between the two forest types. 
+
+#### Precipitation and Discharge antecedent variability
+
+```{r}
+pqv_pdoc <- ggplot(hjm, aes(x=pt.cv, y = q.cv, color = ssn, size = p.doc.mg_l))+
+  geom_point(alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_size(name= expression(paste("Pred. DOC (mg",l^{-1}, ")")))+
+  scale_x_log10()+
+  scale_y_log10()+
+  xlab("Precipitation antecedent variation coefficient (2-weeks-prior)")+
+  ylab("Discharge antecedent variation coefficient (2-weeks-prior)")+
+  facet_wrap(~ws.f)
+pqv_pdoc
+```
+**To do**: Add a caption to the figure and describe the doc changes along the gradients of both precipitation and discharge antecedent variability.
+
+
+#### DOC and dissolved Silica
+
+```{r}
+dsi_pdoc <- ggplot(hjm, aes(x=slc.mg_l, y = p.doc.mg_l, color = ssn, size = uq.cm))+
+  geom_path(data = hjm,aes(slc.mg_l,p.doc.mg_l),size = 0.25, color = "light gray",inherit.aes =                                                                                            FALSE)+
+  geom_point(alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_size("Unit discharge (cm)")+
+  scale_x_log10()+
+  scale_y_log10()+
+  xlab(expression(paste("DSi (mg",l^{-1}, ")")))+
+  ylab(expression(paste("Predicted DOC (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+dsi_pdoc
+```
+**To do**: Add a caption to the figure and summarize the findings from the last three figures in a short concluding paragraph. 
 
 
 
+
+
+
+
+
+
+
+
+
+```{r}
+cnd_doc <- ggplot(hjm,aes(cnd.us_s,doc.mg_l, color = ssn))+
+    geom_path(data = hjm,aes(cnd.us_s,doc.mg_l),size = 0.25, color = "light gray",inherit.aes = FALSE)+
+   geom_point()+
+   facet_wrap(~ws.f)
+cnd_doc
+```
+
+```{r}
+cnd_pdoc <- ggplot(hjm,aes(cnd.us_s,p.doc.mg_l, color = ssn))+
+      geom_path(data = hjm,aes(cnd.us_s,p.doc.mg_l),size = 0.25, color = "gray",inherit.aes = FALSE)+
+  geom_point()+
+  facet_wrap(~ws.f)
+cnd_pdoc
+```
+
+```{r}
+ssn_pdoc <- ggplot(hjm, aes(x = p.doc.mg_l, color = ssn, fill = ssn))+
+  geom_density (bw = 0.15, alpha = 0.5)+
+  facet_wrap(~ws.f)
+ssn_pdoc
+
+```
 
 
 
