@@ -195,5 +195,11 @@ pdoc_ssn_ts <- ggplot(hjm,aes(x=as.Date(dt),y=p.doc.mg_l))+
   facet_wrap(~ws.f)
 pdoc_ssn_ts 
   
-  
+
+#Additional predictors
+
+p<-ggplot(filter(hjm, log.utn.mg_l<0.2), aes(log.uq, log.doc.mg_l, color = ws.f))+
+  # geom_smooth(method = "lm")+
+  geom_point()
+p
 

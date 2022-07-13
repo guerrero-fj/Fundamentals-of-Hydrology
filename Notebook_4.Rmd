@@ -339,39 +339,4 @@ dsi_pdoc
 **To do**: Add a caption to the figure and summarize the findings from the last three figures in a short concluding paragraph. 
 
 
-
-
-
-
-
-
-
-
-
-
-```{r}
-cnd_doc <- ggplot(hjm,aes(cnd.us_s,doc.mg_l, color = ssn))+
-    geom_path(data = hjm,aes(cnd.us_s,doc.mg_l),size = 0.25, color = "light gray",inherit.aes = FALSE)+
-   geom_point()+
-   facet_wrap(~ws.f)
-cnd_doc
-```
-
-```{r}
-cnd_pdoc <- ggplot(hjm,aes(cnd.us_s,p.doc.mg_l, color = ssn))+
-      geom_path(data = hjm,aes(cnd.us_s,p.doc.mg_l),size = 0.25, color = "gray",inherit.aes = FALSE)+
-  geom_point()+
-  facet_wrap(~ws.f)
-cnd_pdoc
-```
-
-```{r}
-ssn_pdoc <- ggplot(hjm, aes(x = p.doc.mg_l, color = ssn, fill = ssn))+
-  geom_density (bw = 0.15, alpha = 0.5)+
-  facet_wrap(~ws.f)
-ssn_pdoc
-
-```
-
-
-
+THE END!
