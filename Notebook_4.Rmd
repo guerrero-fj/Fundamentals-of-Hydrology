@@ -283,7 +283,7 @@ pdoc_ts <- ggplot(hjm,aes(x=as.Date(dt),y=p.doc.mg_l, color = ws.f, fill = ws.f)
   scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
   xlab("Water year")+
   ylab(expression(paste("Dissolved Organic Carbon (mg",l^{-1}, ")")))+
-  facet_wrap(~ws.f)
+  facet_wrap(~ws.f, nrow = 2)
 pdoc_ts
 ```
 ### Processes affecting Dissolved Organic Carbon concentrations in Headwater streams
@@ -325,7 +325,7 @@ pqv_pdoc
 
 ```{r}
 dsi_pdoc <- ggplot(hjm, aes(x=slc.mg_l, y = p.doc.mg_l, color = ssn, size = uq.cm))+
-  geom_path(data = hjm,aes(slc.mg_l,p.doc.mg_l),size = 0.25, color = "light gray",inherit.aes =                                                                                            FALSE)+
+  geom_path(data = hjm,aes(slc.mg_l,p.doc.mg_l),size = 0.45, color =  "gray",inherit.aes =                                                                                            FALSE)+
   geom_point(alpha = 0.5)+
   scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
   scale_size("Unit discharge (cm)")+
