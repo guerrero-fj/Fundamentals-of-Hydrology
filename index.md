@@ -42,7 +42,7 @@ Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledg
 ### WEEK 4
 * July 12 - Paper discussion (*Predicting stream water quality*)
 * July 13 - Student presentations (*Paper discussion)
-* July 14 - Student presentations I | Student presentations
+* July 14 - Student presentations I 
 * July 15 - Student presentations II, including Final project presentation
 
 ## Our Notebooks
