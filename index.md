@@ -69,3 +69,8 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 For our paper discussion we will read the article by Battin (2009); The Boundless Carbon Cycle. You can download the paper through OSU library. You can also download a copy from the class repository [here](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/battin_09_boundless_c_cycle.pdf)
 
 Please note that according to our schedule we will have this discussion on Wednesday **July 13**
+
+
+### Oral presentations!
+
+Well the big moment is here! We entered in final mode for class presentations. Please help your classmates filling this [grading form](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Oral%20Presentation%20Grade%20Form.docx) (make sure to make several copies, so you have a form for each of them). 
