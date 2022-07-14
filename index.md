@@ -65,6 +65,9 @@ Most of our data exploration and analysis will be done in the RStudio environmen
 
 3. Open a new notebook in RStudio and paste the content there. Save this file as dd-mm-yy_notebook_n_last,. For example to have the latest version of Notebook_1 after a class session on June 23, 2022. You would save the file as 23_06_22_notebook_1_last
 
+### Notebook example from students
+Although we do most of our class work in RStudio, students render and submitt their homework as word documents to facilitate edition and comments. This is one of many [examples](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/NOTEBOOK4_DK01.docx)
+
 ### Paper discussion
 For our paper discussion we will read the article by Battin (2009); The Boundless Carbon Cycle. You can download the paper through OSU library. You can also download a copy from the class repository [here](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/battin_09_boundless_c_cycle.pdf)
 
