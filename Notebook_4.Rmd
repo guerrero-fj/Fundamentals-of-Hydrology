@@ -1,0 +1,342 @@
+---
+title: "Notebook 4: Modeling Stream Biogeochemistry"
+author: "your name"
+date: "July 12, 2022"
+output: html_notebook
+---
+
+```{r include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(scales)
+library(GGally)
+library(viridis)#Make sure you have this package installed before running chunks
+library(colorBlindness)#and this one too!
+```
+
+```{r echo=FALSE, message=FALSE, warning= FALSE}
+
+#Multiplot function for GGally
+my_fn <- function(data,mapping, method="loess",...){
+  p <- ggplot(data = data, mapping = mapping) +
+    geom_point() +
+    geom_smooth(method=method, ...)
+  p
+}
+
+#Kernel density estimation function
+bwf <- function(x){bw.SJ(x)} #Sheather and Jones (1991)
+
+
+
+#Loading the data and making some internal arrangement
+hjs <- read.csv("220621_fho_hjandrews.csv")
+hjs$dt <- as.Date(hjs$dt, origin = "1899-12-30", format = "%Y-%m-%d")
+hjs$ws.f <- factor(hjs$ws.f,levels = c("Old-growth","Logged"))
+hjs$ssn <- factor(hjs$ssn,levels = c("Fall","Winter","Spring","Summer"))
+hjm <- dplyr::filter(hjs,wy>1983)
+```
+
+# Fundamentals of Hydrology: Modeling stream biogeochemistry
+
+## Introduction
+
+### Stream Biogeochemistry
+
+**Question**: Explain how the water and carbon cycle are interconnected in streams and rivers?
+
+**Question**: Describe the main forms in which carbon moves in streams and rivers.
+
+Today, we are going to explore bio-geochemical data. These data span several decades and are part of a Long Term Ecological Research Forest in Oregon. The [H.J.Andrews LTER](https://andrewsforest.oregonstate.edu/) is located in the Oregon Cascades. But before looking at these data, we need to load some packages that we installed in the previous session
+
+We will use the same data set analyzed in the stream flow section.
+
+
+Our target variable for this analysis will be Dissolved Organic Carbon (DOC), let's take a look at the sampling conditions as related to discharge, suspended sediments, and dissolved silica (non-reactive tracer).
+
+#### Dissolved Organic Carbon Samples and Discharge
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_uq_ts <- ggplot(hjm,aes(x=as.Date(dt),y=uq.cm, color = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=uq.cm))+
+  xlab("Water year")+
+  ylab("Unit discharge (cm)")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  facet_wrap(~ws.f)
+doc_uq_ts
+```
+
+#### Dissolved Organic Carbon sampling and Total Suspended Solids
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_tss <- ggplot(hjm,aes(x=as.Date(dt),y=sed.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=sed.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x)))+
+  xlab("Water year")+
+  ylab(expression(paste("Suspended Sediments (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_tss
+```
+
+#### Dissolved Organic Carbon sampling and Dissolved Silica
+
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_slc <- ggplot(hjm,aes(x=as.Date(dt),y=slc.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=slc.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Silica (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_slc
+```
+
+#### Dissolved Organic Carbon sampling and Dissolved Organic Nitrogen
+
+```{r  echo=FALSE, message=FALSE, warning = FALSE}
+doc_don <- ggplot(hjm,aes(x=as.Date(dt),y=don.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=don.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Organic Nitrogen (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+doc_don
+```
+**To do:** Add captions to the figures above and describe how representative are the DOC samples in terms of the variation of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen.
+
+### Predicting Dissolved Organic Carbon in Headwater streams
+
+Our selection of discharge, sediment transport, dissolved silica, and dissolved organic nitrogen in the plots above is not random. All of this variables affect the concentrations of DOC directly or indirectly. 
+
+**To do**: Look for examples of relationships between Q, TSS, DSi, and DON with DOC in headwater streams in the literature. Write a short paragraph (no more than 4 sentences about each of the relationships-please include the bibliographic reference)
+
+Let's now explore these relationships in our data set:
+
+```{r echo=FALSE, message=FALSE, warning = FALSE, results='hide', fig.keep='all'}
+require(GGally)
+
+p_dat <- dplyr::select(hjm,ws.f,dt,ssn,log.uq,log.sed.mg_l,log.slc.mg_l,log.don.mg_l,log.doc.mg_l)
+
+p <- ggpairs(p_dat, columns = 4:8, ggplot2::aes(colour = ws.f, alpha = 0.6),
+             lower = list(continuous = wrap(my_fn, method="lm", se=FALSE)))
+for(i in 1:p$nrow){
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j]+
+      scale_fill_manual(values= c("#00BFC4","#F8766D"))+
+      scale_color_manual(values= c("#00BFC4","#F8766D"))
+  }
+}
+p
+```
+**To do**: Add a caption to the figure and compare the relationships observed between DOC and other variables across forest types. Also, how do these relationships compared with what has been reported in the literature?
+
+The correlation coefficients calculated above, are not independent from each other. That is, the effect of the other variables has not been accounted for before estimating $r^2$ values. If we wanted to predict DOC concentrations based on this relationships, our starting point would be to build simple linear regression models.
+
+**Question**: What does it mean "regression" in the context of statistical analyses?
+
+A simple linear regression model is expressed as
+
+y = $\beta_0$ + $\beta_1$*x + $\epsilon$
+
+
+Where:
+y = response variable (the one we are interested in predicting, in our case DOC)
+x = predictor (the variable we are using to predict the response, e.g., Q, or TSS, or DSi)
+$\beta_0$ = Intercept (the value of our response variable when the predictor = 0)
+$\beta_1$ = Slope (the rate of change of our response variable per unit change in our predictor)
+
+
+Let's start with a simple linear regression of DOC against Q:
+
+```{r}
+uq_model = lm(log.doc.mg_l~log.uq + ws.f, hjm)
+summary(uq_model)
+```
+
+Let's take a look at the residuals:
+
+```{r}
+res_plot <- ggplot(uq_model, aes(x= uq_model$residuals, color = ws.f, fill = ws.f))+
+  geom_density(bw=0.085, alpha = 0.5)+
+  geom_vline(xintercept = 0)+
+  facet_wrap(~ws.f, scales = "free_x")+
+  xlab("Residuals = Observed - Predicted DOC")+
+  ylab("Estimated kernel density")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")
+res_plot
+```
+
+
+Let's look now at the regression of DOC against Dsi
+
+```{r}
+dsi_model = lm(log.doc.mg_l~log.slc.mg_l + ws.f, hjm)
+summary(dsi_model)
+```
+Let's take a look at the residuals again:
+
+```{r}
+dsi_res_plot <- ggplot(uq_model, aes(x=dsi_model$residuals, color = ws.f, fill = ws.f))+
+  geom_density(bw=.085,alpha = 0.5)+
+  geom_vline(xintercept = 0)+
+  facet_wrap(~ws.f, scales = "free_x")+
+  xlab("Residuals = Observed - Predicted DOC")+
+  ylab("Estimated kernel density")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")
+dsi_res_plot
+```
+Let's build now a regression model including both Q and DSi
+
+
+```{r}
+m_model_0 <- lm(log.doc.mg_l~log.uq+log.slc.mg_l+ws.f, hjm)
+summary(m_model_0)
+```
+
+Let's look at the residuals:
+
+```{r}
+m0_res_plot <- ggplot(m_model_0, aes(x =m_model_0$residuals, color = ws.f, fill = ws.f))+
+  geom_density(bw=0.085, alpha = 0.5)+
+  geom_vline(xintercept = 0)+
+  facet_wrap(~ws.f, scales = "free_x")+
+  xlab("Residuals = Observed - Predicted DOC")+
+  ylab("Estimated kernel density")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")
+m0_res_plot
+```
+
+Let's add all our predictor variables:
+
+```{r}
+doc_mod <- lm(log.doc.mg_l ~ log.uq + q.cv + log.ptm + pt.cv + log.sed.mg_l + (log.slc.mg_l + log.don.mg_l) * ssn + ws.f + log.utn.mg_l, data = dplyr::filter(hjm,is.na(hjm$doc.mg_l)==FALSE))
+summary(doc_mod)
+```
+And explore the residuals:
+
+```{r}
+doc_res_plot <- ggplot(doc_mod, aes(x = doc_mod$residuals, color = ws.f, fill = ws.f))+
+  geom_density(bw = 0.05, alpha = 0.5)+
+  geom_vline(xintercept = 0)+
+  xlab("Residuals = Observed - Predicted DOC")+
+  ylab("Estimated kernel density")+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  facet_wrap(~ws.f)
+doc_res_plot
+```
+
+Let's now predict DOC across our entire data set:
+
+```{r}
+hjm$p.doc.mg_l <- exp(predict.lm(doc_mod,newdata = hjm,na.action = na.pass))
+cm <- lm(doc.mg_l~p.doc.mg_l,hjm)
+hjm$p.doc.mg_l <- (cm$coefficients[1] + hjm$p.doc.mg_l)/cm$coefficients[2]
+hjm$log.p.doc.mg_l <- log10(hjm$p.doc.mg_l)
+```
+
+And let's take a look at the observed vs. predicted relationship
+
+```{r}
+obs_prd_doc <- ggplot(hjm, aes(x=doc.mg_l,y=p.doc.mg_l,color = ws.f, size =p.doc.mg_l))+
+  geom_point(alpha = 0.5)+
+  geom_abline()+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_size(name= expression(paste("Pred. DOC (mg",l^{-1}, ")")))+
+  xlab("Observed DOC")+
+  ylab("Predicted DOC")+
+  facet_wrap(~ws.f)
+obs_prd_doc 
+```
+
+```{r}
+doc_res_all <- ggplot(doc_mod, aes(x = doc_mod$fitted.values, y = doc_mod$residuals, color = ws.f))+
+  # geom_density(alpha = 0.5)+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  scale_color_manual(values= c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Predicted values")+
+  ylab("Residuals = Observed DOC - Predicted DOC")+
+  facet_wrap(~ws.f, scales="free_x")
+doc_res_all
+```
+Let's take a look at the entire time series for DOC and the observed values
+
+```{r}
+pdoc_ts <- ggplot(hjm,aes(x=as.Date(dt),y=p.doc.mg_l, color = ws.f, fill = ws.f))+
+  geom_line()+
+  geom_point(data=dplyr::filter(hjs,is.na(hjs$doc.mg_l)==FALSE),aes(x=as.Date(dt),y=doc.mg_l))+
+  scale_color_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  scale_fill_manual(values = c("#00BFC4","#F8766D"), name = "Forest type")+
+  xlab("Water year")+
+  ylab(expression(paste("Dissolved Organic Carbon (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f, nrow = 2)
+pdoc_ts
+```
+### Processes affecting Dissolved Organic Carbon concentrations in Headwater streams
+
+In our model, we have formally tested hypothesis about the relationship between DOC and multiple variables (Q, P, TSS, Seasonality, etc.). Now is time to use our reconstructed historical time series to explore different processes affecting DOC concentrations in headwater streams. 
+
+#### Seasonality
+
+```{r}
+ssn_pdoc <- ggplot(hjm, aes(x=p.doc.mg_l, color = ssn, fill = ssn))+
+  geom_density(bw = 0.2,alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_fill_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  xlab(expression(paste("Predicted DOC (mg",l^{-1}, ")")))+
+  ylab("Estimated Kernel Density")+
+  facet_wrap(~ws.f)
+ssn_pdoc
+```
+**To do**: Add a caption to the figure and describe the differences in doc seasonal behavior between the two forest types. 
+
+#### Precipitation and Discharge antecedent variability
+
+```{r}
+pqv_pdoc <- ggplot(hjm, aes(x=pt.cv, y = q.cv, color = ssn, size = p.doc.mg_l))+
+  geom_point(alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_size(name= expression(paste("Pred. DOC (mg",l^{-1}, ")")))+
+  scale_x_log10()+
+  scale_y_log10()+
+  xlab("Precipitation antecedent variation coefficient (2-weeks-prior)")+
+  ylab("Discharge antecedent variation coefficient (2-weeks-prior)")+
+  facet_wrap(~ws.f)
+pqv_pdoc
+```
+**To do**: Add a caption to the figure and describe the doc changes along the gradients of both precipitation and discharge antecedent variability.
+
+
+#### DOC and dissolved Silica
+
+```{r}
+dsi_pdoc <- ggplot(hjm, aes(x=slc.mg_l, y = p.doc.mg_l, color = ssn, size = uq.cm))+
+  geom_path(data = hjm,aes(slc.mg_l,p.doc.mg_l),size = 0.45, color =  "gray",inherit.aes =                                                                                            FALSE)+
+  geom_point(alpha = 0.5)+
+  scale_color_manual(values = c("#31688EFF","#440154FF","#FDE725FF","#35B779FF"),name ="Season")+
+  scale_size("Unit discharge (cm)")+
+  scale_x_log10()+
+  scale_y_log10()+
+  xlab(expression(paste("DSi (mg",l^{-1}, ")")))+
+  ylab(expression(paste("Predicted DOC (mg",l^{-1}, ")")))+
+  facet_wrap(~ws.f)
+dsi_pdoc
+```
+**To do**: Add a caption to the figure and summarize the findings from the last three figures in a short concluding paragraph. 
+
+
+THE END!
