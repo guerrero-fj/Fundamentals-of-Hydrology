@@ -49,13 +49,13 @@ Davie, T. & N. W. Quinn. 2019. Fundamentals of Hydrology. 3rd. Edition. Routledg
 
 Most of our data exploration and analysis will be done in the RStudio environment using R Notebooks. I will provide a Notebook for each session, e.g., streamflow, precipitation, water quality, etc. Most of our assignments will be connected to these Notebooks. The downloable versions below are always up to date. 
 
-* [Notebook 0](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_0.Rmd)
-* [Notebook 1](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_1.Rmd)
+* [Notebook_0](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_0.Rmd)
+* [Notebook_1](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_1.Rmd)
 * [Notebook_2](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_2.Rmd)
 *   [Precipitation dataset](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/220627_hja_precipt.csv)
 * [Notebook_3](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_3.Rmd)
 * Erosion and Sediment Transport [MURAL](https://app.mural.co/t/oregonstate7865/m/oregonstate7865/1656544423986/dc3ebd262ce741ac1e6fd91caf6d254658de66a0?sender=uaa06939fbabfc43444e21792)
-* [Notebook 4](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_4.Rmd)
+* [Notebook_4](https://github.com/guerrero-fj/Fundamentals-of-Hydrology/blob/main/Notebook_4.Rmd)
 
 ### How to access the content of these notebooks:
 1. Click on the link to the notebook above
